@@ -521,7 +521,7 @@ export default function App() {
             <div className="result-level-row">
               <span className="result-level-label">Next difficulty:</span>
               <div className="level-buttons">
-                {['easy', 'medium', 'hard'].map(l => (
+                {LEVELS.map(l => (
                   <button
                     key={l}
                     className={`level-btn ${level === l ? 'active' : ''}`}
