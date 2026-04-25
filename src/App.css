@@ -477,10 +477,53 @@ h2 {
   box-shadow: none;
 }
 
+/* ── Score group (score + level stats) ── */
+.score-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.level-stats {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ls-correct   { color: #4caf50; }
+.ls-incorrect { color: #f44336; }
+.ls-new       { color: #bbb; }
+
+/* ── Level selector on result screen ── */
+.result-level-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.result-level-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.result-level-row .level-buttons {
+  margin-bottom: 0;
+}
+
+.result-level-row .level-btn {
+  padding: 8px 16px;
+  font-size: 0.88rem;
+}
+
 /* ── Word stats on complete screen ── */
 .word-stats {
   width: 100%;
-  max-width: 340px;
+  max-width: 380px;
   margin: 0 auto 24px;
   text-align: left;
 }
@@ -495,23 +538,33 @@ h2 {
   text-align: center;
 }
 
+.word-stats-header,
 .word-stats-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 6px 0;
   border-bottom: 1px solid #f0f0f0;
-  font-size: 1rem;
-  font-weight: 700;
 }
 
 .word-stats-row:last-child {
   border-bottom: none;
 }
 
+.w-col-head {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ccc;
+  min-width: 60px;
+  text-align: center;
+}
+
 .w-name {
   flex: 1;
   font-size: 0.9rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   color: #333;
 }
@@ -520,7 +573,7 @@ h2 {
   font-size: 1.1rem;
   color: #4caf50;
   font-weight: 900;
-  min-width: 20px;
+  min-width: 60px;
   text-align: center;
 }
 
@@ -528,13 +581,14 @@ h2 {
   font-size: 1.1rem;
   color: #f44336;
   font-weight: 900;
-  min-width: 20px;
+  min-width: 60px;
   text-align: center;
 }
 
 .w-history {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: #bbb;
-  min-width: 80px;
-  text-align: right;
+  min-width: 60px;
+  text-align: center;
 }

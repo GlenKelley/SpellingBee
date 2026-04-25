@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSpeechSynthesis } from './hooks/useSpeechSynthesis'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition'
-import { WORD_LISTS, LEVEL_INFO } from './data/words'
+import { WORD_LISTS, LEVEL_INFO, SENTENCES } from './data/words'
 import './App.css'
 
 function shuffle(arr) {
@@ -14,6 +14,9 @@ function shuffle(arr) {
 }
 
 // ── Stats helpers ──
+// wordStat shape: { correct: number, incorrect: number, lastResult: 'correct'|'incorrect' }
+// userStats shape: { [word]: wordStat }
+
 function loadStats() {
   try { return JSON.parse(localStorage.getItem('spellingbee_stats') || '{}') }
   catch { return {} }
@@ -23,13 +26,34 @@ function recordResult(name, word, correct) {
   if (!name) return
   const stats = loadStats()
   if (!stats[name]) stats[name] = {}
-  if (!stats[name][word]) stats[name][word] = { correct: 0, incorrect: 0 }
+  if (!stats[name][word]) stats[name][word] = { correct: 0, incorrect: 0, lastResult: null }
   stats[name][word][correct ? 'correct' : 'incorrect']++
+  stats[name][word].lastResult = correct ? 'correct' : 'incorrect'
   localStorage.setItem('spellingbee_stats', JSON.stringify(stats))
 }
 
 function getUserStats(name) {
   return name ? (loadStats()[name] || {}) : {}
+}
+
+// Returns words ordered: unanswered → last incorrect → last correct (each tier shuffled)
+function buildWordQueue(level, userStats) {
+  const words = WORD_LISTS[level]
+  const notAnswered = shuffle(words.filter(w => !userStats[w]))
+  const incorrect   = shuffle(words.filter(w => userStats[w]?.lastResult === 'incorrect'))
+  const correct     = shuffle(words.filter(w => userStats[w]?.lastResult === 'correct'))
+  return [...notAnswered, ...incorrect, ...correct]
+}
+
+// Counts by lastResult for the header display
+function computeLevelStats(level, userStats) {
+  const words = WORD_LISTS[level]
+  let correct = 0, incorrect = 0
+  for (const w of words) {
+    if (userStats[w]?.lastResult === 'correct') correct++
+    else if (userStats[w]?.lastResult === 'incorrect') incorrect++
+  }
+  return { correct, incorrect, notAnswered: words.length - correct - incorrect }
 }
 
 function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
@@ -66,23 +90,22 @@ function Stars({ score, total }) {
 
 // phase: 'idle' | 'speaking' | 'ready' | 'listening' | 'result'
 export default function App() {
-  const [screen, setScreen]         = useState('welcome')
-  const [level, setLevel]           = useState('easy')
-  const [gameWords, setGameWords]   = useState([])
-  const [wordIndex, setWordIndex]   = useState(0)
-  const [phase, setPhase]           = useState('idle')
-  const [score, setScore]           = useState(0)
-  const [lastResult, setLastResult] = useState(null)   // 'correct' | 'incorrect'
-  const [lastSpelt, setLastSpelt]   = useState('')
-  const [userName, setUserName]     = useState(() => localStorage.getItem('spellingbee_name') || '')
+  const [screen, setScreen]           = useState('welcome')
+  const [level, setLevel]             = useState('easy')
+  const [wordQueue, setWordQueue]     = useState([])
+  const [phase, setPhase]             = useState('idle')
+  const [score, setScore]             = useState(0)
+  const [lastResult, setLastResult]   = useState(null)   // 'correct' | 'incorrect'
+  const [lastSpelt, setLastSpelt]     = useState('')
+  const [userName, setUserName]       = useState(() => localStorage.getItem('spellingbee_name') || '')
+  const [userStats, setUserStats]     = useState(() => getUserStats(localStorage.getItem('spellingbee_name') || ''))
   const [gameResults, setGameResults] = useState([])
 
   const { speak, cancel: cancelSpeech } = useSpeechSynthesis()
-  const { isListening, letters, isSupported, start: startListening, stop: stopListening } = useSpeechRecognition()
+  const { letters, isSupported, start: startListening, stop: stopListening } = useSpeechRecognition()
 
-  const currentWord = gameWords[wordIndex] ?? ''
+  const currentWord = wordQueue[0] ?? ''
 
-  // Announce the word when a new word becomes active
   const announceWord = useCallback(async (word) => {
     setPhase('speaking')
     await speak(`Please spell,`, { rate: 0.82 })
@@ -119,14 +142,15 @@ export default function App() {
   function handleNameChange(e) {
     const name = e.target.value
     setUserName(name)
+    setUserStats(getUserStats(name))
     localStorage.setItem('spellingbee_name', name)
   }
 
   function handleStartGame() {
     if (!userName.trim()) return
-    const words = shuffle(WORD_LISTS[level])
-    setGameWords(words)
-    setWordIndex(0)
+    const stats = getUserStats(userName)
+    setUserStats(stats)
+    setWordQueue(buildWordQueue(level, stats))
     setScore(0)
     setPhase('idle')
     setLastResult(null)
@@ -137,6 +161,11 @@ export default function App() {
 
   async function handleHearAgain() {
     await speak(currentWord, { rate: 0.3 })
+  }
+
+  async function handleUseSentence() {
+    const sentence = SENTENCES[currentWord]
+    if (sentence) await speak(sentence, { rate: 0.82 })
   }
 
   function handleStartSpelling() {
@@ -153,6 +182,8 @@ export default function App() {
     setLastResult(correct ? 'correct' : 'incorrect')
     if (correct) setScore(s => s + 1)
     recordResult(userName, target, correct)
+    const newStats = getUserStats(userName)
+    setUserStats(newStats)
     setGameResults(r => [...r, { word: target, correct }])
     setPhase('result')
     if (correct) {
@@ -175,12 +206,7 @@ export default function App() {
 
   function handleNextWord() {
     cancelSpeech()
-    if (wordIndex + 1 >= gameWords.length) {
-      setGameWords(shuffle(WORD_LISTS[level]))
-      setWordIndex(0)
-    } else {
-      setWordIndex(i => i + 1)
-    }
+    setWordQueue(buildWordQueue(level, userStats))
     setPhase('idle')
     setLastResult(null)
     setLastSpelt('')
@@ -244,7 +270,6 @@ export default function App() {
       pct >= 80   ? 'Fantastic work! 🌟'          :
       pct >= 60   ? 'Good job! Keep practising! 👍' :
                     'Keep practising — you will get there! 💪'
-    const userStats = getUserStats(userName)
     return (
       <div className="app">
         <div className="card complete-card">
@@ -261,16 +286,18 @@ export default function App() {
           {gameResults.length > 0 && (
             <div className="word-stats">
               <p className="stats-heading">{userName ? `${userName}'s results` : 'Results'}</p>
+              <div className="word-stats-header">
+                <span className="w-name" />
+                <span className="w-col-head">This game</span>
+                <span className="w-col-head">All time</span>
+              </div>
               {gameResults.map(({ word, correct }) => {
                 const ws = userStats[word] || { correct: 0, incorrect: 0 }
-                const total = ws.correct + ws.incorrect
                 return (
                   <div key={word} className="word-stats-row">
                     <span className="w-name">{word.toUpperCase()}</span>
                     <span className={correct ? 'w-tick' : 'w-cross'}>{correct ? '✓' : '✗'}</span>
-                    <span className="w-history">
-                      {total > 1 ? `${ws.correct}/${total} all time` : ''}
-                    </span>
+                    <span className="w-history">{ws.correct}✓ {ws.incorrect}✗</span>
                   </div>
                 )
               })}
@@ -286,12 +313,21 @@ export default function App() {
   }
 
   // ── Game screen ──
+  const lvlStats = computeLevelStats(level, userStats)
+
   return (
     <div className="app">
       <div className="game-header">
-        <span className="progress-text">Word {wordIndex + 1}</span>
+        <span className="progress-text">Word {gameResults.length + 1}</span>
         <button className="btn-finish" onClick={handleFinishGame}>Finish</button>
-        <span className="score-text">Score: {score} ⭐</span>
+        <div className="score-group">
+          <span className="score-text">Score: {score} ⭐</span>
+          <span className="level-stats">
+            <span className="ls-correct">✓{lvlStats.correct}</span>
+            <span className="ls-incorrect"> ✗{lvlStats.incorrect}</span>
+            <span className="ls-new"> ·{lvlStats.notAnswered}</span>
+          </span>
+        </div>
       </div>
 
       <div className="card game-card">
@@ -317,6 +353,11 @@ export default function App() {
               <button className="btn-secondary" onClick={handleHearAgain}>
                 🔊 Hear Again
               </button>
+              {SENTENCES[currentWord] && (
+                <button className="btn-secondary" onClick={handleUseSentence}>
+                  💬 Use in a sentence
+                </button>
+              )}
               <button className="btn-spell" onClick={handleStartSpelling} disabled={!isSupported}>
                 🎤 Start Spelling
               </button>
@@ -364,6 +405,21 @@ export default function App() {
                 <LetterBoxes word={currentWord} spelt={currentWord} revealed />
               </>
             )}
+
+            <div className="result-level-row">
+              <span className="result-level-label">Next difficulty:</span>
+              <div className="level-buttons">
+                {['easy', 'medium', 'hard'].map(l => (
+                  <button
+                    key={l}
+                    className={`level-btn ${level === l ? 'active' : ''}`}
+                    onClick={() => setLevel(l)}
+                  >
+                    {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <button className="btn-next" onClick={handleNextWord}>
               ➡️ Next Word
