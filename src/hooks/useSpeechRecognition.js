@@ -1,0 +1,120 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+// Maps spoken words/phonetic letter names → the actual letter
+const PHONETIC = {
+  a:'a', b:'b', c:'c', d:'d', e:'e', f:'f', g:'g', h:'h',
+  i:'i', j:'j', k:'k', l:'l', m:'m', n:'n', o:'o', p:'p',
+  q:'q', r:'r', s:'s', t:'t', u:'u', v:'v', w:'w', x:'x',
+  y:'y', z:'z',
+  ay:'a', bee:'b', see:'c', sea:'c', dee:'d', ee:'e',
+  ef:'f', eff:'f', gee:'g', aitch:'h', haitch:'h', eye:'i',
+  jay:'j', kay:'k', el:'l', em:'m', en:'n', oh:'o', owe:'o',
+  pee:'p', cue:'q', queue:'q', ar:'r', are:'r', ess:'s',
+  tee:'t', tea:'t', you:'u', yew:'u', vee:'v',
+  ex:'x', why:'y', wye:'y', zed:'z', zee:'z',
+}
+
+function transcriptToLetters(transcript) {
+  if (!transcript) return ''
+  let clean = transcript.toLowerCase().replace(/[^a-z\s]/g, '').trim()
+  // Handle the two-word phonetic name for W
+  clean = clean.replace(/\bdouble\s+you\b/g, 'w').replace(/\bdouble\s+u\b/g, 'w')
+  if (!clean) return ''
+
+  const result = []
+  for (const word of clean.split(/\s+/)) {
+    if (!word) continue
+    if (PHONETIC[word]) {
+      result.push(PHONETIC[word])
+    } else {
+      // Word not in phonetic map — treat each character as a letter (e.g. "cat" → c,a,t)
+      for (const ch of word) {
+        if (/[a-z]/.test(ch)) result.push(ch)
+      }
+    }
+  }
+  return result.join('')
+}
+
+export function useSpeechRecognition() {
+  const [isListening, setIsListening]   = useState(false)
+  const [letters, setLetters]           = useState('')
+  const [isSupported, setIsSupported]   = useState(false)
+
+  const recognitionRef  = useRef(null)
+  const isActiveRef     = useRef(false)  // true while we want to keep listening
+  const shouldRestart   = useRef(false)  // flag to restart after no-speech error
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) return
+    setIsSupported(true)
+
+    const r = new SpeechRecognition()
+    r.continuous      = true
+    r.interimResults  = true
+    r.lang            = 'en-AU'
+    r.maxAlternatives = 1
+
+    r.onresult = (event) => {
+      let finalText = ''
+      let interimText = ''
+      for (let i = 0; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript + ' '
+        } else {
+          interimText += event.results[i][0].transcript
+        }
+      }
+      const combined = (finalText + interimText).trim()
+      setLetters(transcriptToLetters(combined))
+    }
+
+    r.onerror = (event) => {
+      if (event.error === 'no-speech' && isActiveRef.current) {
+        // Restart so the student can keep spelling after a pause
+        shouldRestart.current = true
+        return
+      }
+      if (event.error !== 'aborted') {
+        console.error('Speech recognition error:', event.error)
+      }
+      isActiveRef.current = false
+      setIsListening(false)
+    }
+
+    r.onend = () => {
+      if (shouldRestart.current && isActiveRef.current) {
+        shouldRestart.current = false
+        setTimeout(() => {
+          try { r.start() } catch (_) { isActiveRef.current = false; setIsListening(false) }
+        }, 80)
+        return
+      }
+      isActiveRef.current = false
+      setIsListening(false)
+    }
+
+    recognitionRef.current = r
+    return () => { r.abort() }
+  }, [])
+
+  const start = useCallback(() => {
+    if (!recognitionRef.current) return
+    setLetters('')
+    isActiveRef.current   = true
+    shouldRestart.current = false
+    try {
+      recognitionRef.current.start()
+      setIsListening(true)
+    } catch (_) {}
+  }, [])
+
+  const stop = useCallback(() => {
+    isActiveRef.current   = false
+    shouldRestart.current = false
+    if (recognitionRef.current) recognitionRef.current.stop()
+  }, [])
+
+  return { isListening, letters, isSupported, start, stop }
+}
