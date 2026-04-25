@@ -5,7 +5,8 @@
   flex-direction: column;
   align-items: center;
   padding: 20px 16px 40px;
-  background: linear-gradient(160deg, #fff9e6 0%, #fff3cc 60%, #ffe5a0 100%);
+  background: var(--app-bg, linear-gradient(160deg, #fff9e6 0%, #fff3cc 60%, #ffe5a0 100%));
+  transition: background 0.4s ease;
 }
 
 .card {
@@ -72,17 +73,36 @@ h1 {
 }
 
 .level-btn:hover {
-  border-color: #ffb800;
+  border-color: var(--accent, #ffb800);
   color: #333;
   transform: translateY(-2px);
 }
 
 .level-btn.active {
-  background: #ffb800;
-  border-color: #ffb800;
+  background: var(--accent, #ffb800);
+  border-color: var(--accent, #ffb800);
   color: #fff;
-  box-shadow: 0 4px 18px rgba(255, 184, 0, 0.4);
+  box-shadow: 0 4px 18px var(--accent-shadow, rgba(255, 184, 0, 0.4));
   transform: translateY(-2px);
+}
+
+.level-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 5px;
+  opacity: 0.55;
+  transition: opacity 0.18s, filter 0.18s;
+}
+
+.level-btn.active .level-icon {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.result-level-row .level-icon {
+  width: 13px;
+  height: 13px;
 }
 
 /* Warning banner */
@@ -100,7 +120,7 @@ h1 {
 
 /* Primary action button */
 .btn-primary {
-  background: #ffb800;
+  background: var(--accent, #ffb800);
   color: #fff;
   border: none;
   border-radius: 16px;
@@ -109,13 +129,13 @@ h1 {
   font-weight: 800;
   cursor: pointer;
   transition: all 0.18s;
-  box-shadow: 0 4px 22px rgba(255, 184, 0, 0.4);
+  box-shadow: 0 4px 22px var(--accent-shadow, rgba(255, 184, 0, 0.4));
 }
 
 .btn-primary:hover {
-  background: #e6a600;
+  background: var(--accent-hover, #e6a600);
   transform: translateY(-3px);
-  box-shadow: 0 6px 26px rgba(255, 184, 0, 0.5);
+  box-shadow: 0 6px 26px var(--accent-shadow, rgba(255, 184, 0, 0.4));
 }
 
 /* ── Game header ── */
@@ -138,7 +158,7 @@ h1 {
 .score-text {
   font-size: 1rem;
   font-weight: 800;
-  color: #ffb800;
+  color: var(--accent, #ffb800);
 }
 
 .btn-finish {
@@ -225,7 +245,7 @@ h1 {
 }
 
 .btn-secondary:hover {
-  border-color: #ffb800;
+  border-color: var(--accent, #ffb800);
   color: #222;
   transform: translateY(-2px);
 }
@@ -416,7 +436,7 @@ h2 {
   margin: 8px 0 4px;
 }
 
-.score-big   { font-size: 5.5rem; font-weight: 900; color: #ffb800; line-height: 1; }
+.score-big   { font-size: 5.5rem; font-weight: 900; color: var(--accent, #ffb800); line-height: 1; }
 .score-denom { font-size: 2.2rem; font-weight: 700; color: #bbb; }
 
 .pct {
@@ -434,7 +454,7 @@ h2 {
 }
 
 .star        { font-size: 2.6rem; color: #e0e0e0; transition: color 0.3s; }
-.star.lit    { color: #ffb800; }
+.star.lit    { color: var(--accent, #ffb800); }
 
 .end-message {
   font-size: 1.15rem;
@@ -472,7 +492,7 @@ h2 {
 }
 
 .name-input:focus {
-  border-color: #ffb800;
+  border-color: var(--accent, #ffb800);
 }
 
 .btn-primary:disabled {

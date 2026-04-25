@@ -6,6 +6,21 @@ import './App.css'
 
 const LEVELS = Object.keys(WORD_LISTS)
 
+const COLOR_THEMES = {
+  white: {
+    '--app-bg':        'linear-gradient(160deg, #fff9e6 0%, #fff3cc 60%, #ffe5a0 100%)',
+    '--accent':        '#ffb800',
+    '--accent-hover':  '#e6a600',
+    '--accent-shadow': 'rgba(255, 184, 0, 0.4)',
+  },
+  pink: {
+    '--app-bg':        'linear-gradient(160deg, #fce4ec 0%, #f8bbd0 60%, #f06292 100%)',
+    '--accent':        '#e91e63',
+    '--accent-hover':  '#c2185b',
+    '--accent-shadow': 'rgba(233, 30, 99, 0.35)',
+  },
+}
+
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -242,6 +257,9 @@ export default function App() {
     setLastSpelt('')
   }
 
+  // ── Theme ──
+  const appStyle = COLOR_THEMES[LEVEL_INFO[level]?.color] ?? COLOR_THEMES.white
+
   // ── Screens ──
 
   if (screen === 'welcome') {
@@ -250,7 +268,7 @@ export default function App() {
     ).length
 
     return (
-      <div className="app">
+      <div className="app" style={appStyle}>
         <div className="card welcome-card">
           <div className="bee">🐝</div>
           <h1>Spelling Bee</h1>
@@ -276,6 +294,7 @@ export default function App() {
                 className={`level-btn ${level === l ? 'active' : ''}`}
                 onClick={() => setLevel(l)}
               >
+                <img src={`/icons/${LEVEL_INFO[l].icon}.svg`} alt="" className="level-icon" />
                 {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
               </button>
             ))}
@@ -325,7 +344,7 @@ export default function App() {
     const lvlPct       = Math.round((lvlCorrect.length / levelWords.length) * 100)
 
     return (
-      <div className="app">
+      <div className="app" style={appStyle}>
         <div className="card complete-card">
           {mode === 'revision' && lvlIncorrect.length === 0
             ? <div className="bee">🌟</div>

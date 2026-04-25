@@ -125,9 +125,9 @@ export const SENTENCES = {
 };
 
 export const LEVEL_INFO = {
-  easy:   { label: 'Easy',   stars: 1, description: 'Year 1–2 (ages 5–7)' },
-  medium: { label: 'Medium', stars: 2, description: 'Year 3–4 (ages 7–9)' },
-  hard:   { label: 'Hard',   stars: 3, description: 'Year 5–6 (ages 9–11)' },
+  easy:   { label: 'Easy',   stars: 1, color: 'white', icon: 'general', description: 'Year 1–2 (ages 5–7)' },
+  medium: { label: 'Medium', stars: 2, color: 'white', icon: 'general', description: 'Year 3–4 (ages 7–9)' },
+  hard:   { label: 'Hard',   stars: 3, color: 'white', icon: 'general', description: 'Year 5–6 (ages 9–11)' },
   level_2_general: { label: 'Level 2 General', stars: 2, color: 'pink', icon: 'general', description: 'General Continued' },
   level_2_arts: { label: 'Level 2 Arts', stars: 2, color: 'pink', icon: 'arts', description: '' },
   level_2_food: { label: 'Level 2 Food', stars: 2, color: 'pink', icon: 'food', description: '' },
