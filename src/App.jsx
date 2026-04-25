@@ -36,6 +36,11 @@ function getUserStats(name) {
   return name ? (loadStats()[name] || {}) : {}
 }
 
+// Returns only words where lastResult === 'incorrect', shuffled
+function buildRevisionQueue(level, userStats) {
+  return shuffle(WORD_LISTS[level].filter(w => userStats[w]?.lastResult === 'incorrect'))
+}
+
 // Returns words ordered: unanswered → last incorrect → last correct (each tier shuffled)
 function buildWordQueue(level, userStats) {
   const words = WORD_LISTS[level]
@@ -92,6 +97,7 @@ function Stars({ score, total }) {
 export default function App() {
   const [screen, setScreen]           = useState('welcome')
   const [level, setLevel]             = useState('easy')
+  const [mode, setMode]               = useState('normal')  // 'normal' | 'revision'
   const [wordQueue, setWordQueue]     = useState([])
   const [phase, setPhase]             = useState('idle')
   const [score, setScore]             = useState(0)
@@ -146,17 +152,29 @@ export default function App() {
     localStorage.setItem('spellingbee_name', name)
   }
 
-  function handleStartGame() {
-    if (!userName.trim()) return
-    const stats = getUserStats(userName)
-    setUserStats(stats)
-    setWordQueue(buildWordQueue(level, stats))
+  function startGame(queue, gameMode) {
+    setWordQueue(queue)
+    setMode(gameMode)
     setScore(0)
     setPhase('idle')
     setLastResult(null)
     setLastSpelt('')
     setGameResults([])
     setScreen('game')
+  }
+
+  function handleStartGame() {
+    if (!userName.trim()) return
+    const stats = getUserStats(userName)
+    setUserStats(stats)
+    startGame(buildWordQueue(level, stats), 'normal')
+  }
+
+  function handleStartRevision() {
+    if (!userName.trim()) return
+    const stats = getUserStats(userName)
+    setUserStats(stats)
+    startGame(buildRevisionQueue(level, stats), 'revision')
   }
 
   async function handleHearAgain() {
@@ -210,7 +228,13 @@ export default function App() {
 
   function handleNextWord() {
     cancelSpeech()
-    setWordQueue(buildWordQueue(level, userStats))
+    if (mode === 'revision') {
+      const remaining = buildRevisionQueue(level, userStats)
+      if (remaining.length === 0) { setScreen('complete'); return }
+      setWordQueue(remaining)
+    } else {
+      setWordQueue(buildWordQueue(level, userStats))
+    }
     setPhase('idle')
     setLastResult(null)
     setLastSpelt('')
@@ -219,6 +243,10 @@ export default function App() {
   // ── Screens ──
 
   if (screen === 'welcome') {
+    const incorrectCount = WORD_LISTS[level].filter(
+      w => userStats[w]?.lastResult === 'incorrect'
+    ).length
+
     return (
       <div className="app">
         <div className="card welcome-card">
@@ -258,9 +286,22 @@ export default function App() {
             </div>
           )}
 
-          <button className="btn-primary" onClick={handleStartGame} disabled={!userName.trim()}>
-            Start Game 🚀
-          </button>
+          <div className="start-buttons">
+            <button className="btn-primary" onClick={handleStartGame} disabled={!userName.trim()}>
+              Start Game 🚀
+            </button>
+            <button
+              className="btn-revision-start"
+              onClick={handleStartRevision}
+              disabled={!userName.trim() || incorrectCount === 0}
+              title={incorrectCount === 0 ? 'No incorrect words to revise' : ''}
+            >
+              🔁 Revision
+              {incorrectCount > 0
+                ? <span className="revision-count">{incorrectCount} to review</span>
+                : <span className="revision-count">nothing to review</span>}
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -284,8 +325,17 @@ export default function App() {
     return (
       <div className="app">
         <div className="card complete-card">
-          <div className="bee">🏆</div>
-          <h2>Game Complete!</h2>
+          {mode === 'revision' && lvlIncorrect.length === 0
+            ? <div className="bee">🌟</div>
+            : <div className="bee">🏆</div>}
+          <h2>{mode === 'revision' && lvlIncorrect.length === 0
+            ? 'All Clear!'
+            : 'Game Complete!'}</h2>
+          {mode === 'revision' && lvlIncorrect.length === 0 && (
+            <p className="revision-cleared">
+              All incorrect {LEVEL_INFO[level].label.toLowerCase()} words have been cleared!
+            </p>
+          )}
           <div className="final-score">
             <span className="score-big">{score}</span>
             <span className="score-denom"> / {total}</span>
@@ -352,7 +402,7 @@ export default function App() {
             )}
           </div>
 
-          <button className="btn-primary" onClick={() => setScreen('welcome')}>
+          <button className="btn-primary" onClick={() => { setMode('normal'); setScreen('welcome') }}>
             Play Again 🔄
           </button>
         </div>
@@ -366,8 +416,15 @@ export default function App() {
   return (
     <div className="app">
       <div className="game-header">
-        <span className="progress-text">Word {gameResults.length + 1}</span>
-        <button className="btn-finish" onClick={handleFinishGame}>Finish</button>
+        <span className="progress-text">
+          {mode === 'revision'
+            ? `${wordQueue.length} left to review`
+            : `Word ${gameResults.length + 1}`}
+        </span>
+        <div className="header-center">
+          {mode === 'revision' && <span className="revision-badge">Revision</span>}
+          <button className="btn-finish" onClick={handleFinishGame}>Finish</button>
+        </div>
         <div className="score-group">
           <span className="score-text">Score: {score} ⭐</span>
           <span className="level-stats">

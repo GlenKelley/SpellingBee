@@ -482,6 +482,83 @@ h2 {
   box-shadow: none;
 }
 
+/* ── Start buttons (normal + revision) ── */
+.start-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-revision-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #fff;
+  color: #e65100;
+  border: 2px solid #ffb74d;
+  border-radius: 16px;
+  padding: 12px 36px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s;
+  width: 100%;
+  max-width: 280px;
+}
+
+.btn-revision-start:hover:not(:disabled) {
+  background: #fff3e0;
+  border-color: #e65100;
+  transform: translateY(-2px);
+}
+
+.btn-revision-start:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.revision-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-revision-start:not(:disabled) .revision-count {
+  color: #e65100;
+}
+
+/* ── Revision badge in game header ── */
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.revision-badge {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1.5px solid #ffb74d;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Revision cleared message on complete screen ── */
+.revision-cleared {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4caf50;
+  margin: 0 0 12px;
+}
+
 /* ── Score group (score + level stats) ── */
 .score-group {
   display: flex;
