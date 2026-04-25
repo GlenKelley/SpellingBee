@@ -9,6 +9,23 @@
   transition: background 0.4s ease;
 }
 
+.app-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1060px;
+}
+
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .card {
   background: #fff;
   border-radius: 24px;
@@ -762,3 +779,134 @@ h2 {
 .chip-correct   { background: #e8f5e9; color: #2e7d32; }
 .chip-incorrect { background: #ffebee; color: #c62828; }
 .chip-untried   { background: #f5f5f5; color: #999; }
+
+/* ── Leaderboard panel ── */
+.leaderboard {
+  width: 220px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  padding: 18px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+  position: sticky;
+  top: 24px;
+  margin-top: 48px;
+  backdrop-filter: blur(4px);
+}
+
+.lb-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.lb-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #333;
+}
+
+.lb-level {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent, #ffb800);
+}
+
+.lb-empty {
+  font-size: 0.85rem;
+  color: #bbb;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.lb-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-row.lb-me .lb-name {
+  color: var(--accent, #ffb800);
+  font-weight: 900;
+}
+
+.lb-row.lb-me .lb-bar-fill {
+  background: linear-gradient(90deg, var(--accent, #ffb800), var(--accent-hover, #e6a600));
+}
+
+.lb-rank {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ccc;
+  width: 22px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.lb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lb-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+
+.lb-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #444;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.lb-pct {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.lb-bar-track {
+  height: 5px;
+  background: #f0f0f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.lb-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 920px) {
+  .app-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .leaderboard {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 0;
+    position: static;
+  }
+}

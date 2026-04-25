@@ -67,6 +67,17 @@ function buildWordQueue(level, userStats) {
   return [...notAnswered, ...incorrect, ...correct]
 }
 
+function getLeaderboard(level) {
+  const allStats = loadStats()
+  const words = WORD_LISTS[level]
+  return Object.entries(allStats)
+    .map(([name, stats]) => {
+      const correct = words.filter(w => stats[w]?.lastResult === 'correct').length
+      return { name, correct, total: words.length, pct: Math.round((correct / words.length) * 100) }
+    })
+    .sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name))
+}
+
 // Counts by lastResult for the header display
 function computeLevelStats(level, userStats) {
   const words = WORD_LISTS[level]
@@ -95,6 +106,38 @@ function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
         }
         return <div key={i} className={cls}>{display}</div>
       })}
+    </div>
+  )
+}
+
+function Leaderboard({ level, currentUser }) {
+  const entries = getLeaderboard(level)
+  return (
+    <div className="leaderboard">
+      <div className="lb-header">
+        <span className="lb-title">🏆 Leaderboard</span>
+        <span className="lb-level">{LEVEL_INFO[level].label}</span>
+      </div>
+      {entries.length === 0 ? (
+        <p className="lb-empty">No scores yet</p>
+      ) : (
+        <div className="lb-entries">
+          {entries.map((entry, i) => (
+            <div key={entry.name} className={`lb-row${entry.name === currentUser ? ' lb-me' : ''}`}>
+              <span className="lb-rank">#{i + 1}</span>
+              <div className="lb-info">
+                <div className="lb-name-row">
+                  <span className="lb-name">{entry.name}</span>
+                  <span className="lb-pct">{entry.pct}%</span>
+                </div>
+                <div className="lb-bar-track">
+                  <div className="lb-bar-fill" style={{ width: `${entry.pct}%` }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -269,6 +312,8 @@ export default function App() {
 
     return (
       <div className="app" style={appStyle}>
+        <div className="app-layout">
+        <div className="main-col">
         <div className="card welcome-card">
           <div className="bee">🐝</div>
           <h1>Spelling Bee</h1>
@@ -324,6 +369,9 @@ export default function App() {
             </button>
           </div>
         </div>
+        </div>
+        <Leaderboard level={level} currentUser={userName} />
+        </div>
       </div>
     )
   }
@@ -345,6 +393,8 @@ export default function App() {
 
     return (
       <div className="app" style={appStyle}>
+        <div className="app-layout">
+        <div className="main-col">
         <div className="card complete-card">
           {mode === 'revision' && lvlIncorrect.length === 0
             ? <div className="bee">🌟</div>
@@ -427,6 +477,9 @@ export default function App() {
             Play Again 🔄
           </button>
         </div>
+        </div>
+        <Leaderboard level={level} currentUser={userName} />
+        </div>
       </div>
     )
   }
@@ -435,7 +488,9 @@ export default function App() {
   const lvlStats = computeLevelStats(level, userStats)
 
   return (
-    <div className="app">
+    <div className="app" style={appStyle}>
+      <div className="app-layout">
+      <div className="main-col">
       <div className="game-header">
         <span className="progress-text">
           {mode === 'revision'
@@ -557,6 +612,9 @@ export default function App() {
             </button>
           </div>
         )}
+      </div>
+      </div>
+      <Leaderboard level={level} currentUser={userName} />
       </div>
     </div>
   )
