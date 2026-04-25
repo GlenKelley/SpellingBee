@@ -18,6 +18,29 @@ export const WORD_LISTS = {
     'garden', 'people', 'butter', 'castle', 'circle', 'battle', 'gentle', 'little', 'middle', 'purple',
     'simple', 'table', 'bottle', 'candle', 'finger',
   ],
+  level_2_general: [
+    'whine', 'wily', 'windmill', 'windpipe', 'wingspan', 'wishful', 'wonderful', 'wrist'
+  ],
+  level_2_arts: [
+    'author', 'casting', 'clef', 'coda', 'creative', 'kiln', 'Lawson', 'movement', 'myth',
+    'opera', 'picture', 'puppet', 'saga', 'scene', 'tempo', 'topic', 'translate', 'viola', 'woodwind'
+  ],
+  level_2_food: [
+    'apricot', 'cherry', 'famine', 'flower', 'fruit', 'galley', 'kettle', 'miso', 'sugar', 'onion',
+    'pepper', 'pickle', 'ramen', 'rissole', 'tangy', 'thirsty', 'yeast'
+  ],
+  level_2_geography: [
+    'Asia', 'atoll', 'Brazil', 'bushfire', 'canyon', 'cavern', 'delta', 'desert', 'Greece', 'India',
+    'island', 'landslide', 'magma', 'nature', 'Samoa', 'sleet', 'Sweden', 'Tonga', 'tundra'
+  ],
+  level_2_science: [
+    'Aldrin', 'compass', 'concave', 'cosmos', 'database', 'gradient', 'litre', 'measure', 'Newton',
+    'oblong', 'password', 'planet', 'refresh', 'Saturn', 'terminal', 'volume', 'Venus', 'width'
+  ],
+  level_2_sports: [
+    'arrow', 'backstroke', 'baseball', 'billycart', 'canoe', 'cosplay', 'enjoy', 'hobby', 'picnic',
+    'pontoon', 'rugby', 'sailor', 'skiff', 'sprint', 'stadium', 'swimming', 'tennis', 'travel', 'windsurf'
+  ],
 };
 
 export const SENTENCES = {
@@ -105,6 +128,12 @@ export const LEVEL_INFO = {
   easy:   { label: 'Easy',   stars: 1, description: 'Year 1–2 (ages 5–7)' },
   medium: { label: 'Medium', stars: 2, description: 'Year 3–4 (ages 7–9)' },
   hard:   { label: 'Hard',   stars: 3, description: 'Year 5–6 (ages 9–11)' },
+  level_2_general: { label: 'Level 2 General', stars: 2, color: 'pink', icon: 'general', description: 'General Continued' },
+  level_2_arts: { label: 'Level 2 Arts', stars: 2, color: 'pink', icon: 'arts', description: '' },
+  level_2_food: { label: 'Level 2 Food', stars: 2, color: 'pink', icon: 'food', description: '' },
+  level_2_geography: { label: 'Level 2 Geography', stars: 2, color: 'pink', icon: 'geography', description: '' },
+  level_2_science: { label: 'Level 2 Science', stars: 2, color: 'pink', icon: 'science', description: '' },
+  level_2_sports: { label: 'Level 2 Sports', stars: 2, color: 'pink', icon: 'sports', description: '' },
 };
 
 export const WORDS_PER_GAME = 10;
