@@ -26,12 +26,8 @@ function transcriptToLetters(transcript) {
     if (!word) continue
     if (PHONETIC[word]) {
       result.push(PHONETIC[word])
-    } else {
-      // Word not in phonetic map — treat each character as a letter (e.g. "cat" → c,a,t)
-      for (const ch of word) {
-        if (/[a-z]/.test(ch)) result.push(ch)
-      }
     }
+    // words not in the phonetic map are ignored — user must spell letter by letter
   }
   return result.join('')
 }
