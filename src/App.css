@@ -597,3 +597,71 @@ h2 {
   min-width: 60px;
   text-align: center;
 }
+
+/* ── Level progress on complete screen ── */
+.level-progress {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 24px;
+  text-align: left;
+}
+
+.lvl-summary {
+  text-align: center;
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.lvl-correct  { font-size: 1.4rem; font-weight: 900; color: #4caf50; }
+.lvl-denom    { font-weight: 700; color: #555; }
+.lvl-pct      { font-weight: 700; color: #aaa; }
+
+.lvl-bar-track {
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.lvl-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.chip-group {
+  margin-bottom: 14px;
+}
+
+.chip-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+
+.chip-label-correct   { color: #4caf50; }
+.chip-label-incorrect { color: #f44336; }
+.chip-label-untried   { color: #bbb; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.chip-correct   { background: #e8f5e9; color: #2e7d32; }
+.chip-incorrect { background: #ffebee; color: #c62828; }
+.chip-untried   { background: #f5f5f5; color: #999; }

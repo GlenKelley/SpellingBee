@@ -116,5 +116,23 @@ export function useSpeechRecognition() {
     if (recognitionRef.current) recognitionRef.current.stop()
   }, [])
 
-  return { isListening, letters, isSupported, start, stop }
+  // abort() drops the session immediately (no final onresult), then restarts clean
+  const reset = useCallback(() => {
+    isActiveRef.current   = false
+    shouldRestart.current = false
+    if (recognitionRef.current) recognitionRef.current.abort()
+    setLetters('')
+    setTimeout(() => {
+      if (!recognitionRef.current) return
+      setLetters('')
+      isActiveRef.current   = true
+      shouldRestart.current = false
+      try {
+        recognitionRef.current.start()
+        setIsListening(true)
+      } catch (_) {}
+    }, 150)
+  }, [])
+
+  return { isListening, letters, isSupported, start, stop, reset }
 }

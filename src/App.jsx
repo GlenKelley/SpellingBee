@@ -102,7 +102,7 @@ export default function App() {
   const [gameResults, setGameResults] = useState([])
 
   const { speak, cancel: cancelSpeech } = useSpeechSynthesis()
-  const { letters, isSupported, start: startListening, stop: stopListening } = useSpeechRecognition()
+  const { letters, isSupported, start: startListening, stop: stopListening, reset: resetListening } = useSpeechRecognition()
 
   const currentWord = wordQueue[0] ?? ''
 
@@ -171,6 +171,10 @@ export default function App() {
   function handleStartSpelling() {
     setPhase('listening')
     startListening()
+  }
+
+  function handleResetSpelling() {
+    resetListening()
   }
 
   async function handleDoneSpelling() {
@@ -270,6 +274,13 @@ export default function App() {
       pct >= 80   ? 'Fantastic work! 🌟'          :
       pct >= 60   ? 'Good job! Keep practising! 👍' :
                     'Keep practising — you will get there! 💪'
+
+    const levelWords   = WORD_LISTS[level]
+    const lvlCorrect   = levelWords.filter(w => userStats[w]?.lastResult === 'correct').sort()
+    const lvlIncorrect = levelWords.filter(w => userStats[w]?.lastResult === 'incorrect').sort()
+    const lvlUntried   = levelWords.filter(w => !userStats[w]).sort()
+    const lvlPct       = Math.round((lvlCorrect.length / levelWords.length) * 100)
+
     return (
       <div className="app">
         <div className="card complete-card">
@@ -285,7 +296,7 @@ export default function App() {
 
           {gameResults.length > 0 && (
             <div className="word-stats">
-              <p className="stats-heading">{userName ? `${userName}'s results` : 'Results'}</p>
+              <p className="stats-heading">{userName ? `${userName}'s results` : 'This game'}</p>
               <div className="word-stats-header">
                 <span className="w-name" />
                 <span className="w-col-head">This game</span>
@@ -303,6 +314,43 @@ export default function App() {
               })}
             </div>
           )}
+
+          <div className="level-progress">
+            <p className="stats-heading">{LEVEL_INFO[level].label} level progress</p>
+            <p className="lvl-summary">
+              <span className="lvl-correct">{lvlCorrect.length}</span>
+              <span className="lvl-denom"> / {levelWords.length} correct</span>
+              <span className="lvl-pct"> — {lvlPct}%</span>
+            </p>
+            <div className="lvl-bar-track">
+              <div className="lvl-bar-fill" style={{ width: `${lvlPct}%` }} />
+            </div>
+
+            {lvlCorrect.length > 0 && (
+              <div className="chip-group">
+                <span className="chip-label chip-label-correct">Correct ({lvlCorrect.length})</span>
+                <div className="chips">
+                  {lvlCorrect.map(w => <span key={w} className="chip chip-correct">{w}</span>)}
+                </div>
+              </div>
+            )}
+            {lvlIncorrect.length > 0 && (
+              <div className="chip-group">
+                <span className="chip-label chip-label-incorrect">Needs practice ({lvlIncorrect.length})</span>
+                <div className="chips">
+                  {lvlIncorrect.map(w => <span key={w} className="chip chip-incorrect">{w}</span>)}
+                </div>
+              </div>
+            )}
+            {lvlUntried.length > 0 && (
+              <div className="chip-group">
+                <span className="chip-label chip-label-untried">Not yet tried ({lvlUntried.length})</span>
+                <div className="chips">
+                  {lvlUntried.map(w => <span key={w} className="chip chip-untried">{w}</span>)}
+                </div>
+              </div>
+            )}
+          </div>
 
           <button className="btn-primary" onClick={() => setScreen('welcome')}>
             Play Again 🔄
@@ -379,9 +427,14 @@ export default function App() {
               <p className="heard-label">I heard: <strong>{letters.toUpperCase()}</strong></p>
             )}
 
-            <button className="btn-done" onClick={handleDoneSpelling} disabled={!letters}>
-              ✅ Done Spelling
-            </button>
+            <div className="btn-row">
+              <button className="btn-secondary" onClick={handleResetSpelling}>
+                🔄 Try Again
+              </button>
+              <button className="btn-done" onClick={handleDoneSpelling} disabled={!letters}>
+                ✅ Done Spelling
+              </button>
+            </div>
           </div>
         )}
 
