@@ -65,6 +65,21 @@ function getUserStats(name) {
   return name ? (loadStats()[name] || {}) : {}
 }
 
+function loadCompletions() {
+  try { return JSON.parse(localStorage.getItem('spellingbee_completions') || '{}') }
+  catch { return {} }
+}
+
+// Records the first time a user completes a level (all words correct). Never overwrites.
+function recordLevelCompletion(userName, level) {
+  if (!userName) return
+  const completions = loadCompletions()
+  if (completions[userName]?.[level]) return
+  if (!completions[userName]) completions[userName] = {}
+  completions[userName][level] = new Date().toISOString()
+  localStorage.setItem('spellingbee_completions', JSON.stringify(completions))
+}
+
 // Returns only words where lastResult === 'incorrect', shuffled
 function buildRevisionQueue(level, userStats) {
   return shuffle(WORD_LISTS[level].filter(w => userStats[w]?.lastResult === 'incorrect'))
@@ -99,13 +114,23 @@ function getLevelStatus(level, userName, userStats) {
 
 function getLeaderboard(level) {
   const allStats = loadStats()
+  const completions = loadCompletions()
   const words = WORD_LISTS[level]
   return Object.entries(allStats)
     .map(([name, stats]) => {
       const correct = words.filter(w => stats[w]?.lastResult === 'correct').length
-      return { name, correct, total: words.length, pct: Math.round((correct / words.length) * 100) }
+      const pct = Math.round((correct / words.length) * 100)
+      const completedAt = completions[name]?.[level] ?? null
+      return { name, correct, total: words.length, pct, completedAt }
     })
-    .sort((a, b) => b.pct - a.pct || a.name.localeCompare(b.name))
+    .sort((a, b) => {
+      if (b.pct !== a.pct) return b.pct - a.pct
+      // Tiebreaker: earlier completion time wins; completed beats never-completed
+      if (a.completedAt && b.completedAt) return new Date(a.completedAt) - new Date(b.completedAt)
+      if (a.completedAt) return -1
+      if (b.completedAt) return 1
+      return a.name.localeCompare(b.name)
+    })
 }
 
 // Counts by lastResult for the header display
@@ -303,6 +328,7 @@ export default function App() {
     recordResult(userName, target, correct)
     const newStats = getUserStats(userName)
     setUserStats(newStats)
+    if (isLevelCompleted(level, newStats)) recordLevelCompletion(userName, level)
     setGameResults(r => [...r, { word: target, correct }])
     setPhase('result')
     if (correct) {
