@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSpeechSynthesis } from './hooks/useSpeechSynthesis'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition'
-import { WORD_LISTS, LEVEL_INFO, WORDS_PER_GAME } from './data/words'
+import { WORD_LISTS, LEVEL_INFO } from './data/words'
 import './App.css'
 
 function shuffle(arr) {
@@ -124,7 +124,7 @@ export default function App() {
 
   function handleStartGame() {
     if (!userName.trim()) return
-    const words = shuffle(WORD_LISTS[level]).slice(0, WORDS_PER_GAME)
+    const words = shuffle(WORD_LISTS[level])
     setGameWords(words)
     setWordIndex(0)
     setScore(0)
@@ -168,16 +168,22 @@ export default function App() {
     }
   }
 
+  function handleFinishGame() {
+    cancelSpeech()
+    setScreen('complete')
+  }
+
   function handleNextWord() {
     cancelSpeech()
     if (wordIndex + 1 >= gameWords.length) {
-      setScreen('complete')
+      setGameWords(shuffle(WORD_LISTS[level]))
+      setWordIndex(0)
     } else {
       setWordIndex(i => i + 1)
-      setPhase('idle')
-      setLastResult(null)
-      setLastSpelt('')
     }
+    setPhase('idle')
+    setLastResult(null)
+    setLastSpelt('')
   }
 
   // ── Screens ──
@@ -231,7 +237,8 @@ export default function App() {
   }
 
   if (screen === 'complete') {
-    const pct = Math.round((score / gameWords.length) * 100)
+    const total = gameResults.length
+    const pct = total > 0 ? Math.round((score / total) * 100) : 0
     const message =
       pct === 100 ? 'Perfect score! Amazing! 🎉' :
       pct >= 80   ? 'Fantastic work! 🌟'          :
@@ -245,10 +252,10 @@ export default function App() {
           <h2>Game Complete!</h2>
           <div className="final-score">
             <span className="score-big">{score}</span>
-            <span className="score-denom"> / {gameWords.length}</span>
+            <span className="score-denom"> / {total}</span>
           </div>
           <p className="pct">{pct}%</p>
-          <Stars score={score} total={gameWords.length} />
+          <Stars score={score} total={total} />
           <p className="end-message">{message}</p>
 
           {gameResults.length > 0 && (
@@ -282,7 +289,8 @@ export default function App() {
   return (
     <div className="app">
       <div className="game-header">
-        <span className="progress-text">Word {wordIndex + 1} of {gameWords.length}</span>
+        <span className="progress-text">Word {wordIndex + 1}</span>
+        <button className="btn-finish" onClick={handleFinishGame}>Finish</button>
         <span className="score-text">Score: {score} ⭐</span>
       </div>
 
@@ -358,7 +366,7 @@ export default function App() {
             )}
 
             <button className="btn-next" onClick={handleNextWord}>
-              {wordIndex + 1 >= gameWords.length ? '🏆 See Results' : '➡️ Next Word'}
+              ➡️ Next Word
             </button>
           </div>
         )}

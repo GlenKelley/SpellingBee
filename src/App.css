@@ -141,6 +141,23 @@ h1 {
   color: #ffb800;
 }
 
+.btn-finish {
+  background: none;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.btn-finish:hover {
+  border-color: #ff9800;
+  color: #ff9800;
+}
+
 /* ── Game card ── */
 .game-card {
   min-height: 380px;
