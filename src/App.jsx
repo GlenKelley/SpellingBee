@@ -19,6 +19,12 @@ const COLOR_THEMES = {
     '--accent-hover':  '#c2185b',
     '--accent-shadow': 'rgba(233, 30, 99, 0.35)',
   },
+  blue: {
+    '--app-bg':        'linear-gradient(160deg, #e3f2fd 0%, #bbdefb 60%, #64b5f6 100%)',
+    '--accent':        '#1976d2',
+    '--accent-hover':  '#1565c0',
+    '--accent-shadow': 'rgba(25, 118, 210, 0.35)',
+  },
   purple: {
     '--app-bg':        'linear-gradient(160deg, #f3e5f5 0%, #e1bee7 60%, #ce93d8 100%)',
     '--accent':        '#9c27b0',

@@ -26,6 +26,11 @@ export const WORD_LISTS = {
     'arrow', 'backstroke', 'baseball', 'billycart', 'canoe', 'cosplay', 'enjoy', 'hobby', 'picnic',
     'pontoon', 'rugby', 'sailor', 'skiff', 'sprint', 'stadium', 'swimming', 'tennis', 'travel', 'windsurf'
   ],
+  level_3_general: [
+    'ability', 'abolish', 'absolute', 'absolve', 'accept', 'access', 'accomplish', 'ache', 'acre', 'address',
+    'adept', 'adverse', 'agitated', 'ailment', 'alibi', 'alley', 'alphabet', 'ambition', 'animated', 'announce',
+    'antelope', 'apology', 'appoint', 'ardous', 'argument'
+  ],
   level_5_general: [
     'amphibious', 'analgesic', 'anecdotal', 'antecedent', 'archetype', 'aspersion', 'autonomous', 'bankruptcy', 'barrister', 'boisterous', 'cachet', 'capricious', 'catastrophe', 'celestial', 'cerebral', 'commissioner', 'conurbation', 'curriculum', 'cyclamen', 'cynicism', 'ebullient', 'egotistical', 'eiphemism', 'foible', 'fortuitous', 'gargoyle', 'geriatric', 'gesticulate', 'gratuitous', 'inauguration', 'innocuous', 'interrogation', 'irreversible', 'linoleum', 'liquidambar', 'monastery'
   ],
@@ -261,7 +266,8 @@ export const LEVEL_INFO = {
   level_2_geography: { label: 'Level 2 Geography', stars: 2, color: 'pink',   icon: 'geography',description: '',                  prerequisites: ['level_2_general'] },
   level_2_science:   { label: 'Level 2 Science',   stars: 2, color: 'pink',   icon: 'science',  description: '',                  prerequisites: ['level_2_general'] },
   level_2_sports:    { label: 'Level 2 Sports',    stars: 2, color: 'pink',   icon: 'sports',   description: '',                  prerequisites: ['level_2_general'] },
-  level_5_general:   { label: 'Level 5 General',   stars: 5, color: 'purple', icon: 'advanced', description: 'Advanced',          prerequisites: ['level_2_general', 'level_2_arts', 'level_2_food', 'level_2_geography', 'level_2_science', 'level_2_sports'] },
+  level_3_general:    { label: 'Level 3 General',  stars: 3, color: 'blue',   icon: 'general',   description: '',                  prerequisites: ['level_2_general', 'level_2_arts', 'level_2_food', 'level_2_geography', 'level_2_science', 'level_2_sports'] },
+  level_5_general:   { label: 'Level 5 General',   stars: 5, color: 'purple', icon: 'advanced', description: 'Advanced',          prerequisites: ['level_3_general'] },
 };
 
 export const WORDS_PER_GAME = 10;
