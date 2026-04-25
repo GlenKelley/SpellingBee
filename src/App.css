@@ -103,6 +103,23 @@ h1 {
   transform: translateY(-2px);
 }
 
+.level-btn.level-locked,
+.level-btn.level-locked:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: #e0e0e0;
+  color: #aaa;
+  background: #fafafa;
+  transform: none;
+  box-shadow: none;
+}
+
+.lock-icon {
+  font-size: 0.8em;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 .level-icon {
   width: 16px;
   height: 16px;

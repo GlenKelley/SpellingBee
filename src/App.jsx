@@ -19,6 +19,12 @@ const COLOR_THEMES = {
     '--accent-hover':  '#c2185b',
     '--accent-shadow': 'rgba(233, 30, 99, 0.35)',
   },
+  purple: {
+    '--app-bg':        'linear-gradient(160deg, #f3e5f5 0%, #e1bee7 60%, #ce93d8 100%)',
+    '--accent':        '#9c27b0',
+    '--accent-hover':  '#7b1fa2',
+    '--accent-shadow': 'rgba(156, 39, 176, 0.35)',
+  },
 }
 
 function shuffle(arr) {
@@ -65,6 +71,24 @@ function buildWordQueue(level, userStats) {
   const incorrect   = shuffle(words.filter(w => userStats[w]?.lastResult === 'incorrect'))
   const correct     = shuffle(words.filter(w => userStats[w]?.lastResult === 'correct'))
   return [...notAnswered, ...incorrect, ...correct]
+}
+
+// Returns true when every word in the level has lastResult === 'correct'
+function isLevelCompleted(level, userStats) {
+  return WORD_LISTS[level].every(w => userStats[w]?.lastResult === 'correct')
+}
+
+// 'unlocked' | 'disabled' | 'hidden'
+// unlocked = all prerequisites completed (or none required)
+// disabled = at least one prerequisite is visible but not all are completed
+// hidden   = every prerequisite is itself hidden (too far down the chain to show)
+function getLevelStatus(level, userName, userStats) {
+  if (userName === 'Admin') return 'unlocked'
+  const prereqs = LEVEL_INFO[level]?.prerequisites ?? []
+  if (prereqs.length === 0) return 'unlocked'
+  if (prereqs.every(p => isLevelCompleted(p, userStats))) return 'unlocked'
+  const anyVisible = prereqs.some(p => getLevelStatus(p, userName, userStats) !== 'hidden')
+  return anyVisible ? 'disabled' : 'hidden'
 }
 
 function getLeaderboard(level) {
@@ -207,9 +231,16 @@ export default function App() {
 
   function handleNameChange(e) {
     const name = e.target.value
+    const stats = getUserStats(name)
     setUserName(name)
-    setUserStats(getUserStats(name))
+    setUserStats(stats)
     localStorage.setItem('spellingbee_name', name)
+    setLevel(prev => {
+      if (getLevelStatus(prev, name, stats) !== 'unlocked') {
+        return LEVELS.find(l => getLevelStatus(l, name, stats) === 'unlocked') ?? prev
+      }
+      return prev
+    })
   }
 
   function startGame(queue, gameMode) {
@@ -333,16 +364,27 @@ export default function App() {
 
           <p className="level-label">Choose your level:</p>
           <div className="level-buttons">
-            {LEVELS.map(l => (
-              <button
-                key={l}
-                className={`level-btn ${level === l ? 'active' : ''}`}
-                onClick={() => setLevel(l)}
-              >
-                <img src={`/icons/${LEVEL_INFO[l].icon}.svg`} alt="" className="level-icon" />
-                {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
-              </button>
-            ))}
+            {LEVELS.map(l => {
+              const status = getLevelStatus(l, userName, userStats)
+              if (status === 'hidden') return null
+              const locked = status === 'disabled'
+              return (
+                <button
+                  key={l}
+                  className={`level-btn ${level === l ? 'active' : ''} ${locked ? 'level-locked' : ''}`}
+                  onClick={() => !locked && setLevel(l)}
+                  disabled={locked}
+                  title={locked
+                    ? `Complete first: ${LEVEL_INFO[l].prerequisites.filter(p => !isLevelCompleted(p, userStats)).map(p => LEVEL_INFO[p].label).join(', ')}`
+                    : ''}
+                >
+                  {locked
+                    ? <span className="lock-icon">🔒</span>
+                    : <img src={`/icons/${LEVEL_INFO[l].icon}.svg`} alt="" className="level-icon" />}
+                  {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
+                </button>
+              )
+            })}
           </div>
 
           {!isSupported && (
@@ -595,15 +637,24 @@ export default function App() {
             <div className="result-level-row">
               <span className="result-level-label">Next difficulty:</span>
               <div className="level-buttons">
-                {LEVELS.map(l => (
-                  <button
-                    key={l}
-                    className={`level-btn ${level === l ? 'active' : ''}`}
-                    onClick={() => setLevel(l)}
-                  >
-                    {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
-                  </button>
-                ))}
+                {LEVELS.map(l => {
+                  const status = getLevelStatus(l, userName, userStats)
+                  if (status === 'hidden') return null
+                  const locked = status === 'disabled'
+                  return (
+                    <button
+                      key={l}
+                      className={`level-btn ${level === l ? 'active' : ''} ${locked ? 'level-locked' : ''}`}
+                      onClick={() => !locked && setLevel(l)}
+                      disabled={locked}
+                      title={locked
+                        ? `Complete first: ${LEVEL_INFO[l].prerequisites.filter(p => !isLevelCompleted(p, userStats)).map(p => LEVEL_INFO[p].label).join(', ')}`
+                        : ''}
+                    >
+                      {locked ? '🔒 ' : ''}{'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 

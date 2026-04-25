@@ -26,6 +26,9 @@ export const WORD_LISTS = {
     'arrow', 'backstroke', 'baseball', 'billycart', 'canoe', 'cosplay', 'enjoy', 'hobby', 'picnic',
     'pontoon', 'rugby', 'sailor', 'skiff', 'sprint', 'stadium', 'swimming', 'tennis', 'travel', 'windsurf'
   ],
+  level_5_general: [
+    'amphibious', 'analgesic', 'anecdotal', 'antecedent', 'archetype', 'aspersion', 'autonomous', 'bankruptcy', 'barrister', 'boisterous', 'cachet', 'capricious', 'catastrophe', 'celestial', 'cerebral', 'commissioner', 'conurbation', 'curriculum', 'cyclamen', 'cynicism', 'ebullient', 'egotistical', 'eiphemism', 'foible', 'fortuitous', 'gargoyle', 'geriatric', 'gesticulate', 'gratuitous', 'inauguration', 'innocuous', 'interrogation', 'irreversible', 'linoleum', 'liquidambar', 'monastery'
+  ],
 };
 
 export const SENTENCES = {
@@ -212,15 +215,53 @@ export const SENTENCES = {
   tennis:    'They played tennis at the local courts every Saturday morning.',
   travel:    'She loves to travel and has visited twelve different countries.',
   windsurf:  'He learned to windsurf on the calm waters of the bay.',
+  // level_5_general
+  amphibious:    'The amphibious vehicle could travel on both land and water.',
+  analgesic:     'The doctor prescribed an analgesic tablet to relieve the pain.',
+  anecdotal:     'The report relied on anecdotal evidence rather than scientific research.',
+  antecedent:    'Understanding the antecedent of a pronoun helps you write clearly.',
+  archetype:     'The lone hero who overcomes great odds is a classic archetype in storytelling.',
+  aspersion:     'It was unfair to cast aspersion on her character without any proof.',
+  autonomous:    'The new robot was fully autonomous and could operate without human guidance.',
+  bankruptcy:    'The company declared bankruptcy after years of mounting financial losses.',
+  barrister:     'The barrister argued the case brilliantly in front of the judge.',
+  boisterous:    'The boisterous crowd cheered loudly as the team scored the winning goal.',
+  cachet:        'Winning the award gave the small restaurant a certain cachet among food lovers.',
+  capricious:    'The capricious weather changed from brilliant sunshine to storms within an hour.',
+  catastrophe:   'The earthquake was a catastrophe that left thousands of people without homes.',
+  celestial:     'The astronomer spent hours studying the celestial bodies through her telescope.',
+  cerebral:      'Chess is a highly cerebral game that demands deep concentration and patience.',
+  commissioner:  'The police commissioner announced new measures to improve public safety.',
+  conurbation:   'Greater Sydney is a vast conurbation that stretches across many connected suburbs.',
+  curriculum:    'The school updated its curriculum to include more digital literacy skills.',
+  cyclamen:      'She placed a pot of cyclamen on the windowsill to brighten the winter room.',
+  cynicism:      'His cynicism about politicians made him reluctant to vote in any election.',
+  ebullient:     'The ebullient host greeted every guest with enormous energy and warmth.',
+  egotistical:   'His egotistical attitude made it very difficult for others to work with him.',
+  euphemism:     'Saying someone has "passed away" is a common euphemism for dying.',
+  foible:        'Everyone has a minor foible or two that their friends learn to accept.',
+  fortuitous:    'It was entirely fortuitous that she ran into her old teacher that afternoon.',
+  gargoyle:      'The stone gargoyle perched on the cathedral corner, staring down at the street.',
+  geriatric:     'The geriatric ward of the hospital specialised in caring for elderly patients.',
+  gesticulate:   'The excited child began to gesticulate wildly as she described the adventure.',
+  gratuitous:    'The editor removed the gratuitous detail from the script as it added nothing.',
+  inauguration:  'The inauguration ceremony marked the beginning of the new president\'s term in office.',
+  innocuous:     'The remark seemed innocuous at the time but caused great offence.',
+  interrogation: 'The detective conducted a lengthy interrogation before the suspect finally confessed.',
+  irreversible:  'The damage caused to the ancient manuscript was completely irreversible.',
+  linoleum:      'The kitchen floor was covered in old linoleum that had begun to crack at the edges.',
+  liquidambar:   'The liquidambar tree turns brilliant shades of red and orange in autumn.',
+  monastery:     'The monks lived a peaceful and simple life in the mountain monastery.',
 };
 
 export const LEVEL_INFO = {
-  level_2_general: { label: 'Level 2 General', stars: 2, color: 'pink', icon: 'general', description: 'General Continued' },
-  level_2_arts: { label: 'Level 2 Arts', stars: 2, color: 'pink', icon: 'arts', description: '' },
-  level_2_food: { label: 'Level 2 Food', stars: 2, color: 'pink', icon: 'food', description: '' },
-  level_2_geography: { label: 'Level 2 Geography', stars: 2, color: 'pink', icon: 'geography', description: '' },
-  level_2_science: { label: 'Level 2 Science', stars: 2, color: 'pink', icon: 'science', description: '' },
-  level_2_sports: { label: 'Level 2 Sports', stars: 2, color: 'pink', icon: 'sports', description: '' },
+  level_2_general:   { label: 'Level 2 General',   stars: 2, color: 'pink',   icon: 'general',  description: 'General Continued', prerequisites: [] },
+  level_2_arts:      { label: 'Level 2 Arts',      stars: 2, color: 'pink',   icon: 'arts',     description: '',                  prerequisites: ['level_2_general'] },
+  level_2_food:      { label: 'Level 2 Food',      stars: 2, color: 'pink',   icon: 'food',     description: '',                  prerequisites: ['level_2_general'] },
+  level_2_geography: { label: 'Level 2 Geography', stars: 2, color: 'pink',   icon: 'geography',description: '',                  prerequisites: ['level_2_general'] },
+  level_2_science:   { label: 'Level 2 Science',   stars: 2, color: 'pink',   icon: 'science',  description: '',                  prerequisites: ['level_2_general'] },
+  level_2_sports:    { label: 'Level 2 Sports',    stars: 2, color: 'pink',   icon: 'sports',   description: '',                  prerequisites: ['level_2_general'] },
+  level_5_general:   { label: 'Level 5 General',   stars: 5, color: 'purple', icon: 'advanced', description: 'Advanced',          prerequisites: ['level_2_general', 'level_2_arts', 'level_2_food', 'level_2_geography', 'level_2_science', 'level_2_sports'] },
 };
 
 export const WORDS_PER_GAME = 10;
