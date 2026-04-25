@@ -15,7 +15,7 @@
   align-items: flex-start;
   gap: 20px;
   width: 100%;
-  max-width: 1060px;
+  max-width: 1260px;
 }
 
 .main-col {
@@ -913,6 +913,135 @@ h2 {
   background: linear-gradient(90deg, #4caf50, #8bc34a);
   border-radius: 99px;
   transition: width 0.4s ease;
+}
+
+/* ── Word image in game card ── */
+.word-image {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 2px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.word-image-sm {
+  width: 100px;
+  height: 100px;
+}
+
+/* ── Word grid panel ── */
+.word-grid-panel {
+  width: 190px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  padding: 18px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+  position: sticky;
+  top: 24px;
+  margin-top: 48px;
+  backdrop-filter: blur(4px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.wgp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.wgp-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #333;
+}
+
+.wgp-level {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent, #ffb800);
+}
+
+.wgp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wgp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.wgp-section-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.wgp-label-correct   { color: #4caf50; }
+.wgp-label-incorrect { color: #f44336; }
+.wgp-label-untried   { color: #bbb; }
+
+.wgp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.wgp-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 7px;
+  border: 2px solid transparent;
+  transition: transform 0.15s;
+  cursor: default;
+}
+
+.wgp-chip:hover { transform: scale(1.1); }
+
+.wgp-chip-correct   { border-color: #4caf50; background: #f1f8f1; }
+.wgp-chip-incorrect { border-color: #f44336; background: #fff3f3; }
+.wgp-chip-untried   { border-color: #e0e0e0; background: #fafafa; }
+
+.wgp-chip-current {
+  outline: 2.5px solid var(--accent, #ffb800);
+  outline-offset: 1px;
+  transform: scale(1.12);
+}
+
+.wgp-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.wgp-word {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #555;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1100px) {
+  .word-grid-panel { display: none; }
 }
 
 @media (max-width: 920px) {

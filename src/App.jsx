@@ -144,6 +144,54 @@ function computeLevelStats(level, userStats) {
   return { correct, incorrect, notAnswered: words.length - correct - incorrect }
 }
 
+function WordImage({ word, className }) {
+  return (
+    <img
+      src={`/images/${word.toLowerCase()}.png`}
+      alt={word}
+      className={className}
+      onError={e => { e.target.onerror = null; e.target.src = '/images/missing.png' }}
+    />
+  )
+}
+
+function WordGridPanel({ level, userStats, currentWord }) {
+  const words = WORD_LISTS[level]
+  const sections = [
+    { status: 'correct',   label: 'Correct',        words: words.filter(w => userStats[w]?.lastResult === 'correct') },
+    { status: 'incorrect', label: 'Needs practice', words: words.filter(w => userStats[w]?.lastResult === 'incorrect') },
+    { status: 'untried',   label: 'Not yet tried',  words: words.filter(w => !userStats[w]) },
+  ]
+  return (
+    <div className="word-grid-panel">
+      <div className="wgp-header">
+        <span className="wgp-title">📚 Words</span>
+        <span className="wgp-level">{LEVEL_INFO[level].label}</span>
+      </div>
+      <div className="wgp-body">
+        {sections.map(({ status, label, words: sWords }) =>
+          sWords.length === 0 ? null : (
+            <div key={status} className="wgp-section">
+              <span className={`wgp-section-label wgp-label-${status}`}>{label} ({sWords.length})</span>
+              <div className="wgp-grid">
+                {sWords.map(w => (
+                  <div
+                    key={w}
+                    className={`wgp-chip wgp-chip-${status}${w === currentWord ? ' wgp-chip-current' : ''}`}
+                    title={w}
+                  >
+                    <WordImage word={w} className="wgp-img" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  )
+}
+
 function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
   const speltChars = spelt ? spelt.toUpperCase().split('') : []
   const count = hideEmpty ? speltChars.length : word.length
@@ -376,6 +424,7 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
+        <WordGridPanel level={level} userStats={userStats} />
         <div className="main-col">
         <div className="card welcome-card">
           <div className="bee">🐝</div>
@@ -468,6 +517,7 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
+        <WordGridPanel level={level} userStats={userStats} />
         <div className="main-col">
         <div className="card complete-card">
           {mode === 'revision' && lvlIncorrect.length === 0
@@ -561,9 +611,12 @@ export default function App() {
   // ── Game screen ──
   const lvlStats = computeLevelStats(level, userStats)
 
+  const gridCurrentWord = ['ready', 'listening', 'result'].includes(phase) ? currentWord : null
+
   return (
     <div className="app" style={appStyle}>
       <div className="app-layout">
+      <WordGridPanel level={level} userStats={userStats} currentWord={gridCurrentWord} />
       <div className="main-col">
       <div className="game-header">
         <span className="progress-text">
@@ -602,7 +655,7 @@ export default function App() {
 
         {phase === 'ready' && (
           <div className="phase">
-            <div className="phase-icon">🐝</div>
+            <WordImage word={currentWord} className="word-image" />
             <p className="phase-message">Now spell the word!</p>
             <div className="btn-row">
               <button className="btn-secondary" onClick={handleHearAgain}>
@@ -626,6 +679,7 @@ export default function App() {
               <span className="mic">🎤</span>
               <span>Listening…</span>
             </div>
+            <WordImage word={currentWord} className="word-image word-image-sm" />
             <p className="phase-message">Say each letter clearly</p>
 
             <LetterBoxes word={currentWord} spelt={letters} revealed={false} hideEmpty />
@@ -647,6 +701,7 @@ export default function App() {
 
         {phase === 'result' && (
           <div className="phase">
+            <WordImage word={currentWord} className="word-image" />
             {lastResult === 'correct' ? (
               <>
                 <div className="result-icon">🌟</div>
