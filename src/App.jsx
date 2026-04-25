@@ -4,6 +4,8 @@ import { useSpeechRecognition } from './hooks/useSpeechRecognition'
 import { WORD_LISTS, LEVEL_INFO, SENTENCES } from './data/words'
 import './App.css'
 
+const LEVELS = Object.keys(WORD_LISTS)
+
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -96,7 +98,7 @@ function Stars({ score, total }) {
 // phase: 'idle' | 'speaking' | 'ready' | 'listening' | 'result'
 export default function App() {
   const [screen, setScreen]           = useState('welcome')
-  const [level, setLevel]             = useState('easy')
+  const [level, setLevel]             = useState(LEVELS[0])
   const [mode, setMode]               = useState('normal')  // 'normal' | 'revision'
   const [wordQueue, setWordQueue]     = useState([])
   const [phase, setPhase]             = useState('idle')
@@ -268,7 +270,7 @@ export default function App() {
 
           <p className="level-label">Choose your level:</p>
           <div className="level-buttons">
-            {['easy', 'medium', 'hard'].map(l => (
+            {LEVELS.map(l => (
               <button
                 key={l}
                 className={`level-btn ${level === l ? 'active' : ''}`}

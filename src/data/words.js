@@ -1,3 +1,7 @@
+// To add a new level:
+//   1. Add an entry to WORD_LISTS (key becomes the level id, order determines display order)
+//   2. Add a matching entry to LEVEL_INFO with label and stars (1–5)
+//   3. Add a sentence for each new word to SENTENCES
 export const WORD_LISTS = {
   easy: [
     'cat', 'dog', 'sun', 'hat', 'big', 'red', 'cup', 'bed', 'sit', 'run',
