@@ -3,6 +3,7 @@
 //   2. Add a matching entry to LEVEL_INFO with label and stars (1–5)
 //   3. Add a sentence for each new word to SENTENCES
 export const WORD_LISTS = {
+  level_1_general: ['antler','bang','barn','basket','black','broad','cabin','chess','chin','dawn','fair','fate','fleet','front','goat','holy','left','letter','mail','marble','monster','mood','pain','path','rare','rash','real','reap','royal','sale','scar','shake','sheep','shine','shoe','since','skim','smile','snore','snow','spider','spine','spoon','stamp','start','steel','swag','tact','tail','tide','total','tower','track','trust','vase','vine','wait','weak','yelp','young','zest'],
   level_2_general: [
     'whine', 'wily', 'windmill', 'windpipe', 'wingspan', 'wishful', 'wonderful', 'wrist'
   ],
@@ -260,6 +261,7 @@ export const SENTENCES = {
 };
 
 export const LEVEL_INFO = {
+  level_1_general:   { label: 'Level 1 General',   stars: 2, color: 'yellow',   icon: 'general',  description: '', prerequisites: [] },
   level_2_general:   { label: 'Level 2 General',   stars: 2, color: 'pink',   icon: 'general',  description: 'General Continued', prerequisites: [] },
   level_2_arts:      { label: 'Level 2 Arts',      stars: 2, color: 'pink',   icon: 'arts',     description: '',                  prerequisites: ['level_2_general'] },
   level_2_food:      { label: 'Level 2 Food',      stars: 2, color: 'pink',   icon: 'food',     description: '',                  prerequisites: ['level_2_general'] },
