@@ -335,9 +335,14 @@ h1 {
   box-shadow: 0 4px 16px rgba(76, 175, 80, 0.35);
 }
 
-.btn-done:hover {
+.btn-done:hover:not(:disabled) {
   background: #388e3c;
   transform: translateY(-2px);
+}
+
+.btn-done:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Result */

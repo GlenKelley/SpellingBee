@@ -129,7 +129,7 @@ export default function App() {
       if (screen === 'complete') { setScreen('welcome'); return }
       if (screen === 'game') {
         if (phase === 'ready' && isSupported) { handleStartSpelling(); return }
-        if (phase === 'listening') { handleDoneSpelling(); return }
+        if (phase === 'listening' && letters) { handleDoneSpelling(); return }
         if (phase === 'result') { handleNextWord(); return }
       }
     }
@@ -379,7 +379,7 @@ export default function App() {
               <p className="heard-label">I heard: <strong>{letters.toUpperCase()}</strong></p>
             )}
 
-            <button className="btn-done" onClick={handleDoneSpelling}>
+            <button className="btn-done" onClick={handleDoneSpelling} disabled={!letters}>
               ✅ Done Spelling
             </button>
           </div>
