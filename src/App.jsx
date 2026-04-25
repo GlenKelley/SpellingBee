@@ -13,6 +13,25 @@ function shuffle(arr) {
   return a
 }
 
+// ── Stats helpers ──
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem('spellingbee_stats') || '{}') }
+  catch { return {} }
+}
+
+function recordResult(name, word, correct) {
+  if (!name) return
+  const stats = loadStats()
+  if (!stats[name]) stats[name] = {}
+  if (!stats[name][word]) stats[name][word] = { correct: 0, incorrect: 0 }
+  stats[name][word][correct ? 'correct' : 'incorrect']++
+  localStorage.setItem('spellingbee_stats', JSON.stringify(stats))
+}
+
+function getUserStats(name) {
+  return name ? (loadStats()[name] || {}) : {}
+}
+
 function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
   const speltChars = spelt ? spelt.toUpperCase().split('') : []
   const count = hideEmpty ? speltChars.length : word.length
@@ -55,6 +74,8 @@ export default function App() {
   const [score, setScore]           = useState(0)
   const [lastResult, setLastResult] = useState(null)   // 'correct' | 'incorrect'
   const [lastSpelt, setLastSpelt]   = useState('')
+  const [userName, setUserName]     = useState(() => localStorage.getItem('spellingbee_name') || '')
+  const [gameResults, setGameResults] = useState([])
 
   const { speak, cancel: cancelSpeech } = useSpeechSynthesis()
   const { isListening, letters, isSupported, start: startListening, stop: stopListening } = useSpeechRecognition()
@@ -95,7 +116,14 @@ export default function App() {
 
   // ── Handlers ──
 
+  function handleNameChange(e) {
+    const name = e.target.value
+    setUserName(name)
+    localStorage.setItem('spellingbee_name', name)
+  }
+
   function handleStartGame() {
+    if (!userName.trim()) return
     const words = shuffle(WORD_LISTS[level]).slice(0, WORDS_PER_GAME)
     setGameWords(words)
     setWordIndex(0)
@@ -103,6 +131,7 @@ export default function App() {
     setPhase('idle')
     setLastResult(null)
     setLastSpelt('')
+    setGameResults([])
     setScreen('game')
   }
 
@@ -123,6 +152,8 @@ export default function App() {
     setLastSpelt(spelt)
     setLastResult(correct ? 'correct' : 'incorrect')
     if (correct) setScore(s => s + 1)
+    recordResult(userName, target, correct)
+    setGameResults(r => [...r, { word: target, correct }])
     setPhase('result')
     if (correct) {
       speak('Brilliant! Well done!', { rate: 0.88 })
@@ -159,6 +190,18 @@ export default function App() {
           <h1>Spelling Bee</h1>
           <p className="tagline">Listen, then spell the word!</p>
 
+          <div className="name-row">
+            <label className="name-label">What's your name?</label>
+            <input
+              className="name-input"
+              type="text"
+              placeholder="Enter your name"
+              value={userName}
+              maxLength={30}
+              onChange={handleNameChange}
+            />
+          </div>
+
           <p className="level-label">Choose your level:</p>
           <div className="level-buttons">
             {['easy', 'medium', 'hard'].map(l => (
@@ -179,7 +222,7 @@ export default function App() {
             </div>
           )}
 
-          <button className="btn-primary" onClick={handleStartGame}>
+          <button className="btn-primary" onClick={handleStartGame} disabled={!userName.trim()}>
             Start Game 🚀
           </button>
         </div>
@@ -194,6 +237,7 @@ export default function App() {
       pct >= 80   ? 'Fantastic work! 🌟'          :
       pct >= 60   ? 'Good job! Keep practising! 👍' :
                     'Keep practising — you will get there! 💪'
+    const userStats = getUserStats(userName)
     return (
       <div className="app">
         <div className="card complete-card">
@@ -206,6 +250,26 @@ export default function App() {
           <p className="pct">{pct}%</p>
           <Stars score={score} total={gameWords.length} />
           <p className="end-message">{message}</p>
+
+          {gameResults.length > 0 && (
+            <div className="word-stats">
+              <p className="stats-heading">{userName ? `${userName}'s results` : 'Results'}</p>
+              {gameResults.map(({ word, correct }) => {
+                const ws = userStats[word] || { correct: 0, incorrect: 0 }
+                const total = ws.correct + ws.incorrect
+                return (
+                  <div key={word} className="word-stats-row">
+                    <span className="w-name">{word.toUpperCase()}</span>
+                    <span className={correct ? 'w-tick' : 'w-cross'}>{correct ? '✓' : '✗'}</span>
+                    <span className="w-history">
+                      {total > 1 ? `${ws.correct}/${total} all time` : ''}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           <button className="btn-primary" onClick={() => setScreen('welcome')}>
             Play Again 🔄
           </button>
