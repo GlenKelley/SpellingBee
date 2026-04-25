@@ -115,7 +115,7 @@ export default function App() {
     startListening()
   }
 
-  function handleDoneSpelling() {
+  async function handleDoneSpelling() {
     stopListening()
     const spelt  = letters.toLowerCase().trim()
     const target = currentWord.toLowerCase()
@@ -123,13 +123,18 @@ export default function App() {
     setLastSpelt(spelt)
     setLastResult(correct ? 'correct' : 'incorrect')
     if (correct) setScore(s => s + 1)
-    speak(
-      correct
-        ? 'Brilliant! Well done!'
-        : `Good try! The word was ${target}.`,
-      { rate: 0.88 }
-    )
     setPhase('result')
+    if (correct) {
+      speak('Brilliant! Well done!', { rate: 0.88 })
+    } else {
+      await speak(`Good try! The word was ${target}:`, { rate: 0.88 })
+      await new Promise(r => setTimeout(r, 250))
+      for (const letter of target) {
+        await speak(letter, { rate: 0.5 })
+      }
+      await new Promise(r => setTimeout(r, 250))
+      await speak(target, { rate: 0.88 })
+    }
   }
 
   function handleNextWord() {
