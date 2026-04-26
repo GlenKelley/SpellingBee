@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSpeechSynthesis } from './hooks/useSpeechSynthesis'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition'
 import { WORD_LISTS, LEVEL_INFO, SENTENCES } from './data/words'
+import { LEVEL_INFO } from './data/level_info'
+import { SENTENCES } from './data/sentences'
 import './App.css'
 
 const LEVELS = Object.keys(WORD_LISTS)
