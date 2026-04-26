@@ -35,6 +35,7 @@ function transcriptToLetters(transcript) {
 export function useSpeechRecognition() {
   const [isListening, setIsListening]   = useState(false)
   const [letters, setLetters]           = useState('')
+  const [rawTranscript, setRawTranscript] = useState('')
   const [isSupported, setIsSupported]   = useState(false)
 
   const recognitionRef  = useRef(null)
@@ -63,6 +64,7 @@ export function useSpeechRecognition() {
         }
       }
       const combined = (finalText + interimText).trim()
+      setRawTranscript(combined)
       setLetters(transcriptToLetters(combined))
     }
 
@@ -98,6 +100,7 @@ export function useSpeechRecognition() {
   const start = useCallback(() => {
     if (!recognitionRef.current) return
     setLetters('')
+    setRawTranscript('')
     isActiveRef.current   = true
     shouldRestart.current = false
     try {
@@ -121,6 +124,7 @@ export function useSpeechRecognition() {
     setTimeout(() => {
       if (!recognitionRef.current) return
       setLetters('')
+      setRawTranscript('')
       isActiveRef.current   = true
       shouldRestart.current = false
       try {
@@ -130,5 +134,5 @@ export function useSpeechRecognition() {
     }, 150)
   }, [])
 
-  return { isListening, letters, isSupported, start, stop, reset }
+  return { isListening, letters, rawTranscript, isSupported, start, stop, reset }
 }

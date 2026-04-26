@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSpeechSynthesis } from './hooks/useSpeechSynthesis'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition'
 import { WORD_LISTS } from './data/words'
@@ -35,6 +35,19 @@ const COLOR_THEMES = {
     '--accent-shadow': 'rgba(156, 39, 176, 0.35)',
   },
 }
+
+const CORRECT_AFFIRMATIONS = [
+  'Brilliant! Well done!',
+  'Amazing! You nailed it!',
+  'Fantastic! Keep it up!',
+  'Superb! You got it!',
+  'Excellent work!',
+  'Outstanding! Well spelled!',
+  'Perfect! Great job!',
+  'Wonderful! You are a star!',
+  'Impressive! Spot on!',
+  'Magnificent! Keep going!',
+]
 
 function shuffle(arr) {
   const a = [...arr]
@@ -274,9 +287,10 @@ export default function App() {
   const [gameResults, setGameResults] = useState([])
 
   const { speak, cancel: cancelSpeech } = useSpeechSynthesis()
-  const { letters, isSupported, start: startListening, stop: stopListening, reset: resetListening } = useSpeechRecognition()
+  const { letters, rawTranscript, isSupported, start: startListening, stop: stopListening, reset: resetListening } = useSpeechRecognition()
 
   const currentWord = wordQueue[0] ?? ''
+  const autoSubmitRef = useRef(false)
 
   const announceWord = useCallback(async (word) => {
     setPhase('speaking')
@@ -301,6 +315,7 @@ export default function App() {
       if (screen === 'complete') { setScreen('welcome'); return }
       if (screen === 'game') {
         if (phase === 'ready' && isSupported) { handleStartSpelling(); return }
+        if (phase === 'listening' && e.key === 'Backspace') { handleResetSpelling(); return }
         if (phase === 'listening' && letters) { handleDoneSpelling(); return }
         if (phase === 'result') { handleNextWord(); return }
       }
@@ -308,6 +323,20 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   })
+
+  // ── Auto-submit when the user says the complete word (e.g. "S-H-A-R-P, sharp") ──
+  useEffect(() => {
+    if (phase !== 'listening' || !currentWord || !rawTranscript) return
+    if (autoSubmitRef.current) return
+    if (
+      letters.toLowerCase() === currentWord.toLowerCase() &&
+      new RegExp(`\\b${currentWord}\\b`, 'i').test(rawTranscript)
+    ) {
+      autoSubmitRef.current = true
+      handleDoneSpelling()
+    }
+  })
+
 
   // ── Handlers ──
 
@@ -360,11 +389,13 @@ export default function App() {
   }
 
   function handleStartSpelling() {
+    autoSubmitRef.current = false
     setPhase('listening')
     startListening()
   }
 
   function handleResetSpelling() {
+    autoSubmitRef.current = false
     resetListening()
   }
 
@@ -383,7 +414,7 @@ export default function App() {
     setGameResults(r => [...r, { word: target, correct }])
     setPhase('result')
     if (correct) {
-      speak('Brilliant! Well done!', { rate: 0.88 })
+      speak(CORRECT_AFFIRMATIONS[Math.floor(Math.random() * CORRECT_AFFIRMATIONS.length)], { rate: 0.88 })
     } else {
       await speak(`Good try! The word was ${target}:`, { rate: 0.88 })
       await new Promise(r => setTimeout(r, 250))
