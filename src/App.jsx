@@ -477,6 +477,23 @@ export default function App() {
             />
           </div>
 
+          <div className="start-buttons">
+            <button className="btn-primary" onClick={handleStartGame} disabled={!userName.trim()}>
+              Start Game 🚀
+            </button>
+            <button
+              className="btn-revision-start"
+              onClick={handleStartRevision}
+              disabled={!userName.trim() || incorrectCount === 0}
+              title={incorrectCount === 0 ? 'No incorrect words to revise' : ''}
+            >
+              🔁 Revision
+              {incorrectCount > 0
+                ? <span className="revision-count">{incorrectCount} to review</span>
+                : <span className="revision-count">nothing to review</span>}
+            </button>
+          </div>
+
           <p className="level-label">Choose your level:</p>
           <div className="level-graph-wrapper">
             <LevelGraph
@@ -495,22 +512,6 @@ export default function App() {
             </div>
           )}
 
-          <div className="start-buttons">
-            <button className="btn-primary" onClick={handleStartGame} disabled={!userName.trim()}>
-              Start Game 🚀
-            </button>
-            <button
-              className="btn-revision-start"
-              onClick={handleStartRevision}
-              disabled={!userName.trim() || incorrectCount === 0}
-              title={incorrectCount === 0 ? 'No incorrect words to revise' : ''}
-            >
-              🔁 Revision
-              {incorrectCount > 0
-                ? <span className="revision-count">{incorrectCount} to review</span>
-                : <span className="revision-count">nothing to review</span>}
-            </button>
-          </div>
         </div>
         </div>
         <Leaderboard level={level} currentUser={userName} />
@@ -740,30 +741,6 @@ export default function App() {
                 <LetterBoxes word={currentWord} spelt={currentWord} revealed />
               </>
             )}
-
-            <div className="result-level-row">
-              <span className="result-level-label">Next difficulty:</span>
-              <div className="level-buttons">
-                {LEVELS.map(l => {
-                  const status = getLevelStatus(l, userName, userStats)
-                  if (status === 'hidden') return null
-                  const locked = status === 'disabled'
-                  return (
-                    <button
-                      key={l}
-                      className={`level-btn ${level === l ? 'active' : ''} ${locked ? 'level-locked' : ''}`}
-                      onClick={() => !locked && setLevel(l)}
-                      disabled={locked}
-                      title={locked
-                        ? `Complete first: ${LEVEL_INFO[l].prerequisites.filter(p => !isLevelCompleted(p, userStats)).map(p => LEVEL_INFO[p].label).join(', ')}`
-                        : ''}
-                    >
-                      {locked ? '🔒 ' : ''}{'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
 
             <button className="btn-next" onClick={handleNextWord}>
               ➡️ Next Word
