@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSpeechSynthesis } from './hooks/useSpeechSynthesis'
 import { useSpeechRecognition } from './hooks/useSpeechRecognition'
-import { WORD_LISTS, LEVEL_INFO, SENTENCES } from './data/words'
+import { WORD_LISTS } from './data/words'
 import { LEVEL_INFO } from './data/level_info'
 import { SENTENCES } from './data/sentences'
+import { LevelGraph } from './components/LevelGraph'
 import './App.css'
 
 const LEVELS = Object.keys(WORD_LISTS)
@@ -446,28 +447,14 @@ export default function App() {
           </div>
 
           <p className="level-label">Choose your level:</p>
-          <div className="level-buttons">
-            {LEVELS.map(l => {
-              const status = getLevelStatus(l, userName, userStats)
-              if (status === 'hidden') return null
-              const locked = status === 'disabled'
-              return (
-                <button
-                  key={l}
-                  className={`level-btn ${level === l ? 'active' : ''} ${locked ? 'level-locked' : ''}`}
-                  onClick={() => !locked && setLevel(l)}
-                  disabled={locked}
-                  title={locked
-                    ? `Complete first: ${LEVEL_INFO[l].prerequisites.filter(p => !isLevelCompleted(p, userStats)).map(p => LEVEL_INFO[p].label).join(', ')}`
-                    : ''}
-                >
-                  {locked
-                    ? <span className="lock-icon">🔒</span>
-                    : <img src={`/icons/${LEVEL_INFO[l].icon}.svg`} alt="" className="level-icon" />}
-                  {'★'.repeat(LEVEL_INFO[l].stars)} {LEVEL_INFO[l].label}
-                </button>
-              )
-            })}
+          <div className="level-graph-wrapper">
+            <LevelGraph
+              levels={LEVELS}
+              level={level}
+              setLevel={setLevel}
+              getLevelStatus={(l) => getLevelStatus(l, userName, userStats)}
+              isLevelCompleted={(l) => isLevelCompleted(l, userStats)}
+            />
           </div>
 
           {!isSupported && (

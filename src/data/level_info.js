@@ -12,7 +12,6 @@ export const LEVEL_INFO = {
 
 	level_2_arts:	{ label: 'Level 2 Arts', stars: 2, color: 'pink', icon: 'arts', description: '', prerequisites: ['level_1_arts', 'level_2_general'] },
 	level_2_food:	{ label: 'Level 2 Food', stars: 2, color: 'pink', icon: 'food', description: '', prerequisites: ['level_1_food', 'level_2_general'] },
-	level_2_general:	{ label: 'Level 2 General', stars: 2, color: 'pink', icon: 'general', description: '', prerequisites: ['level_1_general', 'level_2_general'] },
 	level_2_geography:	{ label: 'Level 2 Geography', stars: 2, color: 'pink', icon: 'geography', description: '', prerequisites: ['level_1_geography', 'level_2_general'] },
 	level_2_science:	{ label: 'Level 2 Science', stars: 2, color: 'pink', icon: 'science', description: '', prerequisites: ['level_1_science', 'level_2_general'] },
 	level_2_sports:	{ label: 'Level 2 Sports', stars: 2, color: 'pink', icon: 'sports', description: '', prerequisites: ['level_1_sports', 'level_2_general'] },
