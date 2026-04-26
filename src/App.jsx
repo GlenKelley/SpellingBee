@@ -5,6 +5,7 @@ import { WORD_LISTS } from './data/words'
 import { LEVEL_INFO } from './data/level_info'
 import { SENTENCES } from './data/sentences'
 import { LevelGraph } from './components/LevelGraph'
+import { getExcludedUsers } from './components/AdminScreen'
 import './App.css'
 
 const LEVELS = Object.keys(WORD_LISTS)
@@ -131,8 +132,10 @@ function getLevelStatus(level, userName, userStats) {
 function getLeaderboard(level) {
   const allStats = loadStats()
   const completions = loadCompletions()
+  const excluded = new Set(getExcludedUsers())
   const words = WORD_LISTS[level]
   return Object.entries(allStats)
+    .filter(([name]) => !excluded.has(name))
     .map(([name, stats]) => {
       const correct = words.filter(w => stats[w]?.lastResult === 'correct').length
       const pct = Math.round((correct / words.length) * 100)

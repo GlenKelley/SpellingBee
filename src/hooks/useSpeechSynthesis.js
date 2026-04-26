@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { AUDIO_LIBRARY } from '../data/audioLibrary'
 
 // Priority-ordered female Australian voices, then female English fallbacks.
 // Names are matched as substrings so "Olivia (Enhanced)" still matches "Olivia".
@@ -35,8 +36,8 @@ function pickVoice() {
 }
 
 export function useSpeechSynthesis() {
-  // Use a ref so speak() is stable and never triggers effect re-runs
-  const voiceRef = useRef(null)
+  const voiceRef        = useRef(null)
+  const currentAudioRef = useRef(null)
 
   useEffect(() => {
     function load() {
@@ -49,12 +50,32 @@ export function useSpeechSynthesis() {
   }, [])
 
   const speak = useCallback((text, options = {}) => {
+    // Stop any currently playing audio or TTS
     window.speechSynthesis.cancel()
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause()
+      currentAudioRef.current = null
+    }
+
+    // Play pre-recorded audio if available
+    const audioSrc = AUDIO_LIBRARY[text]
+    if (audioSrc) {
+      return new Promise((resolve) => {
+        const audio = new Audio(audioSrc)
+        currentAudioRef.current = audio
+        const done = () => { currentAudioRef.current = null; resolve() }
+        audio.onended = done
+        audio.onerror = done
+        audio.play().catch(done)
+      })
+    }
+
+    // Fall back to TTS
     const utterance = new SpeechSynthesisUtterance(text)
     if (voiceRef.current) utterance.voice = voiceRef.current
     utterance.lang   = voiceRef.current?.lang ?? 'en-AU'
     utterance.rate   = options.rate   ?? 0.85
-    utterance.pitch  = options.pitch  ?? 1.0   // let the voice speak naturally
+    utterance.pitch  = options.pitch  ?? 1.0
     utterance.volume = options.volume ?? 1
 
     return new Promise((resolve) => {
@@ -62,10 +83,14 @@ export function useSpeechSynthesis() {
       utterance.onerror = resolve
       window.speechSynthesis.speak(utterance)
     })
-  }, []) // stable – reads voice from ref at call time
+  }, [])
 
   const cancel = useCallback(() => {
     window.speechSynthesis.cancel()
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause()
+      currentAudioRef.current = null
+    }
   }, [])
 
   return { speak, cancel }
