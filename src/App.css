@@ -1324,10 +1324,9 @@ h2 {
 /* ── Prevent page-level horizontal overflow ── */
 body { overflow-x: hidden; }
 
-/* ── Large tablet: slightly shrink the level graph ── */
+/* ── Large tablet: contain graph wrapper ── */
 @media (max-width: 780px) {
   .level-graph-wrapper { overflow: hidden; }
-  .level-graph { zoom: 0.88; }
 }
 
 /* ── Tablet / small desktop ── */
@@ -1369,8 +1368,6 @@ body { overflow-x: hidden; }
 
   .score-big   { font-size: 4rem; }
   .score-denom { font-size: 1.8rem; }
-
-  .level-graph { zoom: 0.72; }
 }
 
 /* ── Mobile ── */
@@ -1391,8 +1388,6 @@ body { overflow-x: hidden; }
   .w-tick,
   .w-cross,
   .w-history { min-width: 44px; }
-
-  .level-graph { zoom: 0.58; }
 }
 
 /* ── Small phones (≤ 400px) ── */
@@ -1406,6 +1401,4 @@ body { overflow-x: hidden; }
   .letter-boxes { gap: 4px; }
 
   .score-big { font-size: 3.2rem; }
-
-  .level-graph { zoom: 0.46; }
 }

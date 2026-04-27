@@ -499,7 +499,6 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
-        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         <div className="main-col">
         <div className="card welcome-card">
           <div className="bee">🐝</div>
@@ -556,6 +555,7 @@ export default function App() {
         </div>
         </div>
         <Leaderboard level={level} currentUser={userName} />
+        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         </div>
       </div>
     )

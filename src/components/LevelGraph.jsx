@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react'
 import { LEVEL_INFO } from '../data/level_info'
 
-// Column assignments: arts/food/geography left of center, general center, science/sports right
 const SUBJECT_COLS = {
   general:   0,
   arts:      1,
@@ -10,15 +10,14 @@ const SUBJECT_COLS = {
   sports:    5,
 }
 
-const CELL_W = 120
-const CELL_H = 120
-const NODE_W = 96
-const NODE_H = 78
+// Full-size layout (desktop/large tablet)
+const DESKTOP = { CELL_W: 120, CELL_H: 120, NODE_W: 96, NODE_H: 78 }
+// Icon-only compact layout (mobile) — fits 6 cols in ~312px
+const COMPACT  = { CELL_W: 52,  CELL_H: 52,  NODE_W: 40, NODE_H: 40 }
+
+const COMPACT_BREAKPOINT = 760
 const NUM_COLS = 6
 const NUM_ROWS = 5
-
-const SVG_W = NUM_COLS * CELL_W  // 720
-const SVG_H = NUM_ROWS * CELL_H  // 600
 
 const COLOR_MAP = {
   yellow: { bg: '#fffbeb', border: '#f0b800', text: '#7a5f00', shadow: 'rgba(240,184,0,0.35)' },
@@ -28,7 +27,6 @@ const COLOR_MAP = {
   purple: { bg: '#f3e5f5', border: '#9c27b0', text: '#4a148c', shadow: 'rgba(156,39,176,0.3)' },
 }
 
-// All level_N_* nodes go in row N-1; column determined by subject
 function getGridPos(levelKey) {
   const match = levelKey.match(/^level_(\d+)_(.+)$/)
   if (!match) return null
@@ -39,23 +37,30 @@ function getGridPos(levelKey) {
   return { row: num - 1, col }
 }
 
-function centerOf(pos) {
-  return {
-    x: pos.col * CELL_W + CELL_W / 2,
-    y: pos.row * CELL_H + CELL_H / 2,
-  }
-}
-
 export function LevelGraph({ levels, level, setLevel, getLevelStatus, isLevelCompleted }) {
+  const [compact, setCompact] = useState(() => window.innerWidth <= COMPACT_BREAKPOINT)
+
+  useEffect(() => {
+    const check = () => setCompact(window.innerWidth <= COMPACT_BREAKPOINT)
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  const { CELL_W, CELL_H, NODE_W, NODE_H } = compact ? COMPACT : DESKTOP
+  const SVG_W = NUM_COLS * CELL_W
+  const SVG_H = NUM_ROWS * CELL_H
+
   const posMap = {}
   for (const l of levels) {
     const pos = getGridPos(l)
     if (pos) posMap[l] = pos
   }
 
-  // Only draw between-row edges; same-row (general→subject within level) edges are
-  // skipped because straight horizontal lines passing through intermediate nodes look messy.
-  // The shared-row layout makes the relationship visually obvious without the lines.
+  const centerOf = (pos) => ({
+    x: pos.col * CELL_W + CELL_W / 2,
+    y: pos.row * CELL_H + CELL_H / 2,
+  })
+
   const edges = []
   for (const l of levels) {
     const toPos = posMap[l]
@@ -131,9 +136,9 @@ export function LevelGraph({ levels, level, setLevel, getLevelStatus, isLevelCom
               {locked
                 ? <span className="graph-node-lock">🔒</span>
                 : <img src={`${import.meta.env.BASE_URL}icons/${info.icon}.svg`} alt="" className="graph-node-icon" />}
-              <span className="graph-node-stars">{'★'.repeat(info.stars)}</span>
+              {!compact && <span className="graph-node-stars">{'★'.repeat(info.stars)}</span>}
             </div>
-            <div className="graph-node-label">{subject}</div>
+            {!compact && <div className="graph-node-label">{subject}</div>}
             {completed && <span className="graph-node-check">✓</span>}
           </button>
         )
