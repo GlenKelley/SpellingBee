@@ -1007,7 +1007,9 @@ h2 {
   border-radius: 7px;
   border: 2px solid transparent;
   transition: transform 0.15s;
-  cursor: default;
+  cursor: pointer;
+  background: none;
+  font: inherit;
 }
 
 .wgp-chip:hover { transform: scale(1.1); }

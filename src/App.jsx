@@ -50,6 +50,17 @@ const CORRECT_AFFIRMATIONS = [
   'Magnificent! Keep going!',
 ]
 
+const INCORRECT_AFFIRMATIONS = [
+  'So close!',
+  'Almost',
+  'Good try',
+  'Good effort',
+  'Bad luck',
+  'Sorry',
+  'You will get it next time',
+]
+
+
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -174,7 +185,7 @@ function WordImage({ word, className }) {
   )
 }
 
-function WordGridPanel({ level, userStats, currentWord }) {
+function WordGridPanel({ level, userStats, currentWord, onWordClick }) {
   const words = WORD_LISTS[level]
   const sections = [
     { status: 'correct',   label: 'Correct',        words: words.filter(w => userStats[w]?.lastResult === 'correct') },
@@ -194,13 +205,14 @@ function WordGridPanel({ level, userStats, currentWord }) {
               <span className={`wgp-section-label wgp-label-${status}`}>{label} ({sWords.length})</span>
               <div className="wgp-grid">
                 {sWords.map(w => (
-                  <div
+                  <button
                     key={w}
                     className={`wgp-chip wgp-chip-${status}${w === currentWord ? ' wgp-chip-current' : ''}`}
                     title={w}
+                    onClick={() => onWordClick?.(w)}
                   >
                     <WordImage word={w} className="wgp-img" />
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -419,13 +431,33 @@ export default function App() {
     if (correct) {
       speak(CORRECT_AFFIRMATIONS[Math.floor(Math.random() * CORRECT_AFFIRMATIONS.length)], { rate: 0.88 })
     } else {
-      await speak(`Good try! The word was ${target}:`, { rate: 0.88 })
+      await speak(INCORRECT_AFFIRMATIONS[Math.floor(Math.random() * INCORRECT_AFFIRMATIONS.length)], { rate: 0.88 })
+      await speak(target, { rate: 0.88 })
       await new Promise(r => setTimeout(r, 250))
       for (const letter of target) {
         await speak(letter, { rate: 0.5 })
       }
       await new Promise(r => setTimeout(r, 250))
       await speak(target, { rate: 0.88 })
+    }
+  }
+
+  function handleJumpToWord(word) {
+    if (phase === 'listening') return  // don't interrupt mid-spelling
+    cancelSpeech()
+    autoSubmitRef.current = false
+    if (screen === 'game') {
+      const allWords = buildWordQueue(level, userStats)
+      setWordQueue([word, ...allWords.filter(w => w !== word)])
+      setPhase('idle')
+      setLastResult(null)
+      setLastSpelt('')
+    } else {
+      if (!userName.trim()) return
+      const stats = getUserStats(userName)
+      setUserStats(stats)
+      const allWords = buildWordQueue(level, stats)
+      startGame([word, ...allWords.filter(w => w !== word)], 'normal')
     }
   }
 
@@ -461,7 +493,7 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
-        <WordGridPanel level={level} userStats={userStats} />
+        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         <div className="main-col">
         <div className="card welcome-card">
           <div className="bee">🐝</div>
@@ -541,7 +573,7 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
-        <WordGridPanel level={level} userStats={userStats} />
+        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         <div className="main-col">
         <div className="card complete-card">
           {mode === 'revision' && lvlIncorrect.length === 0
@@ -640,7 +672,7 @@ export default function App() {
   return (
     <div className="app" style={appStyle}>
       <div className="app-layout">
-      <WordGridPanel level={level} userStats={userStats} currentWord={gridCurrentWord} />
+      <WordGridPanel level={level} userStats={userStats} currentWord={gridCurrentWord} onWordClick={handleJumpToWord} />
       <div className="main-col">
       <div className="game-header">
         <span className="progress-text">

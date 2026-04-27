@@ -22,6 +22,7 @@ const OUT_DIR   = join(__dirname, '..', 'public', 'audio')
 
 const API_KEY  = process.env.ELEVENLABS_API_KEY
 const VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? 'EXAVITQu4vr4xnSDxMaL' // Sarah
+// const VOICE_ID = process.env.ELEVENLABS_VOICE_ID ?? 'r3SDVYUIvcC4EweQtSj0' // Erika
 const MODEL_ID = 'eleven_multilingual_v2'
 
 if (!API_KEY) {
