@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { AdminScreen } from './components/AdminScreen.jsx'
+import { DebugScreen } from './components/DebugScreen.jsx'
 
-const isAdmin = window.location.pathname === '/admin'
+const path = window.location.pathname
+const isAdmin = path.endsWith('/admin')
+const isDebug = path.endsWith('/debug')
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {isAdmin ? <AdminScreen /> : <App />}
+    {isAdmin ? <AdminScreen /> : isDebug ? <DebugScreen /> : <App />}
   </StrictMode>,
 )
