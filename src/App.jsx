@@ -579,7 +579,6 @@ export default function App() {
     return (
       <div className="app" style={appStyle}>
         <div className="app-layout">
-        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         <div className="main-col">
         <div className="card complete-card">
           {mode === 'revision' && lvlIncorrect.length === 0
@@ -665,6 +664,7 @@ export default function App() {
         </div>
         </div>
         <Leaderboard level={level} currentUser={userName} />
+        <WordGridPanel level={level} userStats={userStats} onWordClick={handleJumpToWord} />
         </div>
       </div>
     )
@@ -678,7 +678,6 @@ export default function App() {
   return (
     <div className="app" style={appStyle}>
       <div className="app-layout">
-      <WordGridPanel level={level} userStats={userStats} currentWord={gridCurrentWord} onWordClick={handleJumpToWord} />
       <div className="main-col">
       <div className="game-header">
         <span className="progress-text">
@@ -789,6 +788,7 @@ export default function App() {
       </div>
       </div>
       <Leaderboard level={level} currentUser={userName} />
+      <WordGridPanel level={level} userStats={userStats} currentWord={gridCurrentWord} onWordClick={handleJumpToWord} />
       </div>
     </div>
   )

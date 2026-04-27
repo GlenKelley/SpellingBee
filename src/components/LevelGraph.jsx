@@ -11,11 +11,11 @@ const SUBJECT_COLS = {
 }
 
 // Full-size layout (desktop/large tablet)
-const DESKTOP = { CELL_W: 120, CELL_H: 120, NODE_W: 96, NODE_H: 78 }
+const DESKTOP = { CELL_W: 96, CELL_H: 96, NODE_W: 76, NODE_H: 64 }
 // Icon-only compact layout (mobile) — fits 6 cols in ~312px
 const COMPACT  = { CELL_W: 52,  CELL_H: 52,  NODE_W: 40, NODE_H: 40 }
 
-const COMPACT_BREAKPOINT = 760
+const COMPACT_BREAKPOINT = 820
 const NUM_COLS = 6
 const NUM_ROWS = 5
 
