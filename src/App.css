@@ -1297,12 +1297,115 @@ h2 {
 @media (max-width: 920px) {
   .app-layout {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
   .leaderboard {
     width: 100%;
-    max-width: 600px;
+    max-width: none;
     margin-top: 0;
     position: static;
   }
+
+  /* Re-show word grid in column layout, full width with more columns */
+  .word-grid-panel {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    position: static;
+    margin-top: 0;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .wgp-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* ── Prevent page-level horizontal overflow ── */
+body { overflow-x: hidden; }
+
+/* ── Large tablet: slightly shrink the level graph ── */
+@media (max-width: 780px) {
+  .level-graph-wrapper { overflow: hidden; }
+  .level-graph { zoom: 0.88; }
+}
+
+/* ── Tablet / small desktop ── */
+@media (max-width: 640px) {
+  .app { padding: 12px 12px 32px; }
+
+  .card {
+    padding: 24px 16px;
+    border-radius: 16px;
+  }
+
+  .welcome-card,
+  .complete-card { margin-top: 16px; }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.75rem; }
+  .bee { font-size: 56px; }
+  .tagline { font-size: 1rem; margin-bottom: 20px; }
+
+  .btn-primary {
+    padding: 16px 32px;
+    font-size: 1.15rem;
+    width: 100%;
+  }
+
+  .btn-revision-start { max-width: none; }
+
+  .name-input { width: 100%; max-width: 300px; }
+
+  .game-card { min-height: 280px; }
+
+  .phase-icon { font-size: 48px; }
+
+  .word-image    { width: 120px; height: 120px; }
+  .word-image-sm { width: 80px;  height: 80px;  }
+
+  .result-icon  { font-size: 64px; }
+  .result-title { font-size: 1.7rem; }
+
+  .score-big   { font-size: 4rem; }
+  .score-denom { font-size: 1.8rem; }
+
+  .level-graph { zoom: 0.72; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .lbox {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+  .letter-boxes { gap: 5px; }
+
+  .phase-message { font-size: 1.1rem; }
+
+  .game-header { margin: 12px 0 8px; }
+
+  /* word-stats table: collapse the fixed-width columns a bit */
+  .w-col-head,
+  .w-tick,
+  .w-cross,
+  .w-history { min-width: 44px; }
+
+  .level-graph { zoom: 0.58; }
+}
+
+/* ── Small phones (≤ 400px) ── */
+@media (max-width: 400px) {
+  .lbox {
+    width: 38px;
+    height: 38px;
+    font-size: 1.05rem;
+    border-radius: 7px;
+  }
+  .letter-boxes { gap: 4px; }
+
+  .score-big { font-size: 3.2rem; }
+
+  .level-graph { zoom: 0.46; }
 }
