@@ -177,10 +177,10 @@ function computeLevelStats(level, userStats) {
 function WordImage({ word, className }) {
   return (
     <img
-      src={`/images/${word.toLowerCase()}.svg`}
+      src={`${import.meta.env.BASE_URL}images/${word.toLowerCase()}.svg`}
       alt={word}
       className={className}
-      onError={e => { e.target.onerror = null; e.target.src = '/images/missing.png' }}
+      onError={e => { e.target.onerror = null; e.target.src = `${import.meta.env.BASE_URL}images/missing.svg` }}
     />
   )
 }

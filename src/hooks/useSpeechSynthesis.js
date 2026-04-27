@@ -61,7 +61,7 @@ export function useSpeechSynthesis() {
     const audioSrc = AUDIO_LIBRARY[text]
     if (audioSrc) {
       return new Promise((resolve) => {
-        const audio = new Audio(audioSrc)
+        const audio = new Audio(import.meta.env.BASE_URL + audioSrc)
         currentAudioRef.current = audio
         const done = () => { currentAudioRef.current = null; resolve() }
         audio.onended = done

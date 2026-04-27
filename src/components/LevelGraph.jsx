@@ -130,7 +130,7 @@ export function LevelGraph({ levels, level, setLevel, getLevelStatus, isLevelCom
             <div className="graph-node-top">
               {locked
                 ? <span className="graph-node-lock">🔒</span>
-                : <img src={`/icons/${info.icon}.svg`} alt="" className="graph-node-icon" />}
+                : <img src={`${import.meta.env.BASE_URL}icons/${info.icon}.svg`} alt="" className="graph-node-icon" />}
               <span className="graph-node-stars">{'★'.repeat(info.stars)}</span>
             </div>
             <div className="graph-node-label">{subject}</div>
