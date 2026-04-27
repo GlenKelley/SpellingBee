@@ -223,8 +223,9 @@ function WordGridPanel({ level, userStats, currentWord, onWordClick }) {
   )
 }
 
-function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
+function LetterBoxes({ word, spelt, revealed, hideEmpty, compareWord }) {
   const speltChars = spelt ? spelt.toUpperCase().split('') : []
+  const compareChars = compareWord ? compareWord.toUpperCase().split('') : null
   const count = hideEmpty ? speltChars.length : word.length
   return (
     <div className="letter-boxes">
@@ -232,8 +233,13 @@ function LetterBoxes({ word, spelt, revealed, hideEmpty }) {
         let cls = 'lbox'
         let display = ''
         if (revealed) {
-          cls += ' reveal'
-          display = word[i]?.toUpperCase() ?? ''
+          const letter = word[i]?.toUpperCase() ?? ''
+          if (compareChars) {
+            cls += letter === compareChars[i] ? ' reveal' : ' wrong'
+          } else {
+            cls += ' reveal'
+          }
+          display = letter
         } else if (speltChars[i]) {
           cls += ' filled'
           display = speltChars[i]
@@ -766,11 +772,9 @@ export default function App() {
               </>
             ) : (
               <>
-                <div className="result-icon">💪</div>
-                <p className="result-title incorrect">Good try!</p>
                 <p className="attempt-label">You spelled:</p>
                 <p className="attempt-word">
-                  {lastSpelt ? lastSpelt.toUpperCase() : '(nothing heard)'}
+                  <LetterBoxes word={lastSpelt.toUpperCase()} spelt={lastSpelt.toUpperCase()} revealed compareWord={currentWord} />
                 </p>
                 <p className="correct-label">The word was:</p>
                 <LetterBoxes word={currentWord} spelt={currentWord} revealed />
