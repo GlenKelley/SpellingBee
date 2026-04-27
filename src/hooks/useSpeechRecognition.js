@@ -40,7 +40,6 @@ export function useSpeechRecognition() {
 
   const recognitionRef  = useRef(null)
   const isActiveRef     = useRef(false)  // true while we want to keep listening
-  const shouldRestart   = useRef(false)  // flag to restart after no-speech error
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -69,27 +68,24 @@ export function useSpeechRecognition() {
     }
 
     r.onerror = (event) => {
-      if (event.error === 'no-speech' && isActiveRef.current) {
-        // Restart so the student can keep spelling after a pause
-        shouldRestart.current = true
-        return
-      }
-      if (event.error !== 'aborted') {
-        console.error('Speech recognition error:', event.error)
-      }
+      if (event.error === 'no-speech' || event.error === 'aborted') return
+      // not-allowed, audio-capture, network, etc. — stop listening
+      console.error('Speech recognition error:', event.error)
       isActiveRef.current = false
+      shouldRestart.current = false
       setIsListening(false)
     }
 
     r.onend = () => {
-      if (shouldRestart.current && isActiveRef.current) {
-        shouldRestart.current = false
+      shouldRestart.current = false
+      if (isActiveRef.current) {
+        // iOS Safari ignores continuous:true and stops after each utterance;
+        // restart unconditionally so spelling works across all mobile browsers.
         setTimeout(() => {
           try { r.start() } catch (_) { isActiveRef.current = false; setIsListening(false) }
-        }, 80)
+        }, 100)
         return
       }
-      isActiveRef.current = false
       setIsListening(false)
     }
 
@@ -101,8 +97,7 @@ export function useSpeechRecognition() {
     if (!recognitionRef.current) return
     setLetters('')
     setRawTranscript('')
-    isActiveRef.current   = true
-    shouldRestart.current = false
+    isActiveRef.current = true
     try {
       recognitionRef.current.start()
       setIsListening(true)
@@ -110,23 +105,20 @@ export function useSpeechRecognition() {
   }, [])
 
   const stop = useCallback(() => {
-    isActiveRef.current   = false
-    shouldRestart.current = false
+    isActiveRef.current = false
     if (recognitionRef.current) recognitionRef.current.stop()
   }, [])
 
   // abort() drops the session immediately (no final onresult), then restarts clean
   const reset = useCallback(() => {
-    isActiveRef.current   = false
-    shouldRestart.current = false
+    isActiveRef.current = false
     if (recognitionRef.current) recognitionRef.current.abort()
     setLetters('')
     setTimeout(() => {
       if (!recognitionRef.current) return
       setLetters('')
       setRawTranscript('')
-      isActiveRef.current   = true
-      shouldRestart.current = false
+      isActiveRef.current = true
       try {
         recognitionRef.current.start()
         setIsListening(true)
