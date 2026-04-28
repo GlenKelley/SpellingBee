@@ -428,11 +428,11 @@ export default function App() {
     setLastSpelt(spelt)
     setLastResult(correct ? 'correct' : 'incorrect')
     if (correct) setScore(s => s + 1)
-    recordResult(userName, target, correct)
+    recordResult(userName, currentWord, correct)
     const newStats = getUserStats(userName)
     setUserStats(newStats)
     if (isLevelCompleted(level, newStats)) recordLevelCompletion(userName, level)
-    setGameResults(r => [...r, { word: target, correct }])
+    setGameResults(r => [...r, { word: currentWord, correct }])
     setPhase('result')
     if (correct) {
       speak(CORRECT_AFFIRMATIONS[Math.floor(Math.random() * CORRECT_AFFIRMATIONS.length)], { rate: 0.88 })
