@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import packageJson from '../../package.json'
+import { transcriptToLetters } from '../hooks/useSpeechRecognition'
 
 const SR_API = window.SpeechRecognition || window.webkitSpeechRecognition
 
@@ -9,6 +10,30 @@ function row(label, value) {
       <td style={styles.label}>{label}</td>
       <td style={styles.value}>{String(value)}</td>
     </tr>
+  )
+}
+
+function LetterComparison({ transcript }) {
+  const letters = transcriptToLetters(transcript)
+
+  return (
+    <div style={{ marginBottom: '12px' }}>
+      <div style={styles.compareRow}>
+        <span style={styles.compareLabel}>Raw text</span>
+        <span style={styles.rawText}>{transcript || '—'}</span>
+      </div>
+      <div style={styles.compareRow}>
+        <span style={styles.compareLabel}>Parsed letters</span>
+        <div style={styles.boxes}>
+          {letters
+            ? letters.toUpperCase().split('').map((ch, i) => (
+                <div key={i} style={styles.lbox}>{ch}</div>
+              ))
+            : <span style={{ color: '#888' }}>—</span>
+          }
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -151,9 +176,7 @@ export function DebugScreen() {
           Status: <strong>{isListening ? '🔴 listening' : '⚫ idle'}</strong>
         </p>
 
-        {transcript && (
-          <p style={styles.transcript}>"{transcript}"</p>
-        )}
+        <LetterComparison transcript={transcript} />
 
         <div style={styles.logBox}>
           {log.length === 0
@@ -199,4 +222,17 @@ const styles = {
     fontSize: '12px',
   },
   logLine: { padding: '1px 0', borderBottom: '1px solid #2a2a2a' },
+  compareRow: { display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' },
+  compareLabel: { width: '90px', flexShrink: 0, color: '#888', paddingTop: '2px' },
+  rawText: {
+    background: '#f5f5f5', border: '1px solid #ddd', borderRadius: '6px',
+    padding: '4px 10px', wordBreak: 'break-all', flex: 1,
+  },
+  boxes: { display: 'flex', flexWrap: 'wrap', gap: '5px', flex: 1 },
+  lbox: {
+    width: '40px', height: '40px', border: '2px solid #1976d2',
+    borderRadius: '8px', background: '#e3f2fd', color: '#0d47a1',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: '1.2rem', fontWeight: 900, fontFamily: 'inherit',
+  },
 }

@@ -14,7 +14,7 @@ const PHONETIC = {
   ex:'x', why:'y', wye:'y', zed:'z', zee:'z',
 }
 
-function transcriptToLetters(transcript) {
+export function transcriptToLetters(transcript) {
   if (!transcript) return ''
   let clean = transcript.toLowerCase().replace(/[^a-z\s]/g, '').trim()
   // Handle the two-word phonetic name for W

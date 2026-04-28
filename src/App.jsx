@@ -315,8 +315,8 @@ export default function App() {
 
   const announceWord = useCallback(async (word) => {
     setPhase('speaking')
-    await speak(`Please spell,`, { rate: 0.82 })
-    await new Promise(r => setTimeout(r, 500))
+    //await speak(`Please spell,`, { rate: 0.82 })
+    //await new Promise(r => setTimeout(r, 500))
     await speak(word, { rate: 0.3 })
     setPhase('ready')
   }, [speak])
