@@ -26,6 +26,9 @@ export function transcriptToLetters(transcript) {
     if (!word) continue
     if (PHONETIC[word]) {
       result.push(PHONETIC[word])
+    } else {
+      // we simply take the first letter for words not in the phonetic map 
+      result.push(word[0])
     }
     // words not in the phonetic map are ignored — user must spell letter by letter
   }
