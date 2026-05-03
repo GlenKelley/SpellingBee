@@ -178,7 +178,6 @@ function WordImage({ word, className }) {
   return (
     <img
       src={`${import.meta.env.BASE_URL}images/${word.toLowerCase()}.svg`}
-      alt={word}
       className={className}
       onError={e => { e.target.onerror = null; e.target.src = `${import.meta.env.BASE_URL}images/missing.svg` }}
     />
@@ -208,7 +207,6 @@ function WordGridPanel({ level, userStats, currentWord, onWordClick }) {
                   <button
                     key={w}
                     className={`wgp-chip wgp-chip-${status}${w === currentWord ? ' wgp-chip-current' : ''}`}
-                    title={w}
                     onClick={() => onWordClick?.(w)}
                   >
                     <WordImage word={w} className="wgp-img" />
